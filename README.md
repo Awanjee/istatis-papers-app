@@ -1,13 +1,23 @@
 # Arco Papers App
 
-Flutter front-end for the Arco Papers assistant.
+Flutter web application for Arco Papers AI sales assistant.
 
-## Run
+## Tech Stack
+- Flutter (Web, Android, iOS)
+- Provider state management
+- Dio HTTP client
 
-- Install deps: `flutter pub get`
-- Start the app:
-  - `flutter run --dart-define=API_BASE_URL=http://127.0.0.1:8000`
+## Features
+- AI-powered product and pricing assistant
+- Suggestion chips for common queries
+- Real-time conversation interface
+- Mobile-ready responsive design
 
-## Notes
+## Setup
+```bash
+flutter pub get
+flutter run -d chrome
+```
 
-- The backend should expose `POST /chat` returning JSON `{ "response": "...", "session_id": "..." }`.
+## Backend
+Requires arco-papers-api running on localhost:8000.
