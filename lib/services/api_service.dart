@@ -5,7 +5,7 @@ class ApiService {
   final String _sessionId;
 
   // Change this to your deployed URL later
-  static const String _baseUrl = 'http://127.0.0.1:8000';
+  static const String _baseUrl = 'https://arco-papers-api.onrender.com';
 
   ApiService()
     : _dio = Dio(
