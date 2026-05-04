@@ -5,6 +5,7 @@ import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/suggestion_chips.dart';
+import 'catalogue_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,79 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+  final _scrollController = ScrollController();
+
+  final List<Widget> _screens = const [_ChatTab(), CatalogueScreen()];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFf5f5f5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1a472a),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _currentIndex == 0
+                  ? 'Arco Papers Assistant'
+                  : 'Product Catalogue',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              _currentIndex == 0
+                  ? 'Ask about products, pricing & orders'
+                  : 'Envelopes, Paper & File Carriers',
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+            ),
+          ],
+        ),
+        actions: [
+          if (_currentIndex == 0)
+            IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.white),
+              onPressed: () => context.read<ChatProvider>().clearMessages(),
+              tooltip: 'Clear chat',
+            ),
+        ],
+      ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        selectedItemColor: const Color(0xFF1a472a),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_outlined),
+            activeIcon: Icon(Icons.chat),
+            label: 'Assistant',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_outlined),
+            activeIcon: Icon(Icons.inventory_2),
+            label: 'Catalogue',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Extracted chat tab as a private widget
+class _ChatTab extends StatefulWidget {
+  const _ChatTab();
+
+  @override
+  State<_ChatTab> createState() => _ChatTabState();
+}
+
+class _ChatTabState extends State<_ChatTab> {
   final _scrollController = ScrollController();
 
   void _scrollToBottom() {
@@ -30,64 +104,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFf5f5f5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1a472a),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<ChatProvider>(
+      builder: (context, provider, _) {
+        _scrollToBottom();
+        return Column(
           children: [
-            Text(
-              'Arco Papers Assistant',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+            Expanded(
+              child: provider.messages.isEmpty
+                  ? _buildWelcome()
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      itemCount: provider.messages.length,
+                      itemBuilder: (context, index) =>
+                          ChatBubble(message: provider.messages[index]),
+                    ),
             ),
-            Text(
-              'Ask about products, pricing & orders',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+            if (provider.messages.isEmpty)
+              SuggestionChips(
+                onSuggestionTap: (text) => provider.sendMessage(text),
+              ),
+            const SizedBox(height: 8),
+            ChatInput(
+              isLoading: provider.isLoading,
+              onSend: (text) => provider.sendMessage(text),
             ),
           ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () => context.read<ChatProvider>().clearMessages(),
-            tooltip: 'Clear chat',
-          ),
-        ],
-      ),
-      body: Consumer<ChatProvider>(
-        builder: (context, provider, _) {
-          _scrollToBottom();
-          return Column(
-            children: [
-              Expanded(
-                child: provider.messages.isEmpty
-                    ? _buildWelcome()
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        itemCount: provider.messages.length,
-                        itemBuilder: (context, index) =>
-                            ChatBubble(message: provider.messages[index]),
-                      ),
-              ),
-              if (provider.messages.isEmpty)
-                SuggestionChips(
-                  onSuggestionTap: (text) => provider.sendMessage(text),
-                ),
-              const SizedBox(height: 8),
-              ChatInput(
-                isLoading: provider.isLoading,
-                onSend: (text) => provider.sendMessage(text),
-              ),
-            ],
-          );
-        },
-      ),
+        );
+      },
     );
   }
 
