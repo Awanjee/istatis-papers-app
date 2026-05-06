@@ -6,6 +6,10 @@ Cross-platform — deployable to web, Android, and iOS.
 🌐 **Live:** https://arco-papers-app-6b721.web.app  
 🔗 **Backend:** https://github.com/Awanjee/arco-papers-api
 
+## Demo
+
+▶️ [Watch 2-minute demo](https://www.loom.com/share/516dc81b811446ebbfbe28b6fa49836c)
+
 ---
 
 ## Features
