@@ -6,6 +6,7 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/suggestion_chips.dart';
 import 'catalogue_screen.dart';
+import 'quote_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final _scrollController = ScrollController();
 
-  final List<Widget> _screens = const [_ChatTab(), CatalogueScreen()];
+  final List<Widget> _screens = const [
+    _ChatTab(),
+    CatalogueScreen(),
+    QuoteScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               _currentIndex == 0
                   ? 'Arco Papers Assistant'
-                  : 'Product Catalogue',
+                  : _currentIndex == 1
+                  ? 'Product Catalogue'
+                  : 'Request a Quote',
               style: GoogleFonts.inter(
                 color: Colors.white,
                 fontSize: 16,
@@ -42,7 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               _currentIndex == 0
                   ? 'Ask about products, pricing & orders'
-                  : 'Envelopes, Paper & File Carriers',
+                  : _currentIndex == 1
+                  ? 'Envelopes, Paper & File Carriers'
+                  : 'Get a personalised quote by email',
               style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
             ),
           ],
@@ -72,6 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.inventory_2_outlined),
             activeIcon: Icon(Icons.inventory_2),
             label: 'Catalogue',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.request_quote_outlined),
+            activeIcon: Icon(Icons.request_quote),
+            label: 'Quote',
           ),
         ],
       ),

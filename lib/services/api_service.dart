@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 
+import '../models/quote_request.dart';
+
 class ApiService {
   final Dio _dio;
   final String _sessionId;
 
-  // Change this to your deployed URL later
-  static const String _baseUrl = 'https://arco-papers-api.onrender.com';
+  // URL of the deployed API
+  static const String _baseUrl =
+      'https://arco-papers-api.onrender.com'; // Deployed URL
+  // static const String _baseUrl = 'http://127.0.0.1:8000'; // Local development
 
   ApiService()
     : _dio = Dio(
@@ -29,6 +33,19 @@ class ApiService {
         return 'Connection timed out. Please try again.';
       }
       return 'Error: ${e.message}';
+    }
+  }
+
+  Future<QuoteResponse> requestQuote(QuoteRequest request) async {
+    try {
+      final response = await _dio.post('/quote', data: request.toJson());
+      return QuoteResponse.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      return QuoteResponse(
+        success: false,
+        message: 'Error: ${e.message}',
+        quoteSummary: '',
+      );
     }
   }
 }

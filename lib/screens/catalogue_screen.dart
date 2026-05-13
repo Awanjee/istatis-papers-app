@@ -1,3 +1,4 @@
+import 'package:arco_papers_app/screens/quote_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../data/products_data.dart';
@@ -198,34 +199,23 @@ class _ProductCard extends StatelessWidget {
   }
 
   void _showQuoteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Request Quote',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
-        ),
-        content: Text(
-          'To get a quote for ${product.name}, please '
-          'use our AI assistant or contact us directly.\n\n'
-          'WhatsApp: +92-XXX-XXXXXXX\n'
-          'Email: orders@arcopapers.com',
-          style: GoogleFonts.inter(fontSize: 14, height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1a472a),
-              foregroundColor: Colors.white,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF1a472a),
+            title: Text(
+              'Request Quote',
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: Text('Ask AI Assistant', style: GoogleFonts.inter()),
+            iconTheme: const IconThemeData(color: Colors.white),
           ),
-        ],
+          body: QuoteScreen(preselectedProduct: product),
+        ),
       ),
     );
   }
