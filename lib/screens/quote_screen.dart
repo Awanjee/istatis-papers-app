@@ -79,7 +79,6 @@ class _QuoteScreenState extends State<QuoteScreen> {
     );
 
     final response = await _apiService.requestQuote(request);
-    print('Response: ${response.success} ${response.message}');
 
     setState(() {
       _isLoading = false;
