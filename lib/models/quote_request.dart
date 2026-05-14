@@ -2,7 +2,7 @@ class QuoteRequest {
   final String customerName;
   final String company;
   final String email;
-  final String productType;
+  final String productName;
   final int quantity;
   final String notes;
 
@@ -10,7 +10,7 @@ class QuoteRequest {
     required this.customerName,
     required this.company,
     required this.email,
-    required this.productType,
+    required this.productName,
     required this.quantity,
     this.notes = '',
   });
@@ -19,7 +19,7 @@ class QuoteRequest {
     'customer_name': customerName,
     'company': company,
     'email': email,
-    'product_type': productType,
+    'product_name': productName,
     'quantity': quantity,
     'notes': notes,
   };
@@ -37,8 +37,8 @@ class QuoteResponse {
   });
 
   factory QuoteResponse.fromJson(Map<String, dynamic> json) => QuoteResponse(
-    success: json['success'] as bool,
-    message: json['message'] as String,
-    quoteSummary: json['quote_summary'] as String,
+    success: json['success'] as bool? ?? false,
+    message: json['message'] as String? ?? '',
+    quoteSummary: json['quote_summary'] as String? ?? '',
   );
 }

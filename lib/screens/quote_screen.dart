@@ -28,23 +28,23 @@ class _QuoteScreenState extends State<QuoteScreen> {
   String _quoteSummary = '';
 
   // Product type dropdown
-  String? _selectedProductType;
+  String? _selectedProductName;
 
   static const _productOptions = [
-    ('envelope_c4', 'C4 Envelope (229x324mm)'),
-    ('envelope_c5', 'C5 Envelope (162x229mm)'),
-    ('envelope_dl', 'DL Envelope (110x220mm)'),
-    ('paper_a4_70gsm', 'A4 Paper 70gsm'),
-    ('paper_a4_80gsm', 'A4 Paper 80gsm'),
-    ('file_carrier_standard', 'A4 File Carrier Standard'),
-    ('file_carrier_heavy', 'A4 File Carrier Heavy Duty'),
+    ('C4 Envelope', 'C4 Envelope (229x324mm)'),
+    ('C5 Envelope', 'C5 Envelope (162x229mm)'),
+    ('DL Envelope', 'DL Envelope (110x220mm)'),
+    ('A4 Paper 70gsm', 'A4 Paper 70gsm'),
+    ('A4 Paper 80gsm', 'A4 Paper 80gsm'),
+    ('A4 File Carrier Standard', 'A4 File Carrier Standard'),
+    ('A4 File Carrier Heavy Duty', 'A4 File Carrier Heavy Duty'),
   ];
 
   @override
   void initState() {
     super.initState();
     if (widget.preselectedProduct != null) {
-      _selectedProductType = widget.preselectedProduct!.id;
+      _selectedProductName = widget.preselectedProduct!.id;
     }
   }
 
@@ -60,7 +60,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
 
   Future<void> _submitQuote() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedProductType == null) {
+    if (_selectedProductName == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Please select a product')));
@@ -73,12 +73,13 @@ class _QuoteScreenState extends State<QuoteScreen> {
       customerName: _nameController.text.trim(),
       company: _companyController.text.trim(),
       email: _emailController.text.trim(),
-      productType: _selectedProductType!,
+      productName: _selectedProductName!,
       quantity: int.parse(_quantityController.text.trim()),
       notes: _notesController.text.trim(),
     );
 
     final response = await _apiService.requestQuote(request);
+    print('Response: ${response.success} ${response.message}');
 
     setState(() {
       _isLoading = false;
@@ -165,7 +166,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: _selectedProductType,
+              value: _selectedProductName,
               decoration: _inputDecoration(''),
               hint: Text(
                 'Select a product',
@@ -179,7 +180,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                     ),
                   )
                   .toList(),
-              onChanged: (val) => setState(() => _selectedProductType = val),
+              onChanged: (val) => setState(() => _selectedProductName = val),
             ),
             const SizedBox(height: 14),
 
@@ -312,7 +313,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                 _emailController.clear();
                 _quantityController.clear();
                 _notesController.clear();
-                _selectedProductType = null;
+                _selectedProductName = null;
               }),
               style: OutlinedButton.styleFrom(
                 foregroundColor: const Color(0xFF1a472a),

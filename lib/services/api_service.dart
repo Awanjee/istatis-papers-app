@@ -7,9 +7,9 @@ class ApiService {
   final String _sessionId;
 
   // URL of the deployed API
-  static const String _baseUrl =
-      'https://arco-papers-api.onrender.com'; // Deployed URL
-  // static const String _baseUrl = 'http://127.0.0.1:8000'; // Local development
+  // static const String _baseUrl =
+  //      'https://arco-papers-api.onrender.com'; // Deployed URL
+  static const String _baseUrl = 'http://127.0.0.1:8000'; // Local development
 
   ApiService()
     : _dio = Dio(
