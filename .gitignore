@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local Cursor rules (personal, not shared)
+.cursor/rules/profile.local.md
+.cursor/rules/handover.global.md

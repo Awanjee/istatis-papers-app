@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../models/quote_request.dart';
 import '../models/product.dart';
+import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 
 class QuoteScreen extends StatefulWidget {
@@ -20,7 +22,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
   final _emailController = TextEditingController();
   final _quantityController = TextEditingController();
   final _notesController = TextEditingController();
-  final _apiService = ApiService();
+  late final ApiService _apiService;
 
   bool _isLoading = false;
   bool _submitted = false;
@@ -43,6 +45,12 @@ class _QuoteScreenState extends State<QuoteScreen> {
   @override
   void initState() {
     super.initState();
+    final auth = context.read<AuthProvider>();
+    _apiService = ApiService(accessTokenProvider: () => auth.accessToken);
+    final email = auth.userEmail;
+    if (email != null && email.isNotEmpty) {
+      _emailController.text = email;
+    }
     if (widget.preselectedProduct != null) {
       _selectedProductName = widget.preselectedProduct!.id;
     }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
-import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
+import 'widgets/auth_gate.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ArcoApp());
 }
 
@@ -12,16 +16,18 @@ class ArcoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ChatProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider()..init(),
+        ),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+      ],
       child: MaterialApp(
         title: 'Arco Papers',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1a472a)),
-          useMaterial3: true,
-        ),
-        home: const HomeScreen(),
+        theme: AppTheme.light,
+        home: const AuthGate(),
       ),
     );
   }

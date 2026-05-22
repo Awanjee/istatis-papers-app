@@ -14,14 +14,18 @@ Cross-platform — deployable to web, Android, and iOS.
 
 ## Features
 
+- Supabase email/password auth (login, signup, auth gate)
 - AI-powered sales assistant with multi-turn memory
 - Product catalogue with category filters and pricing tiers
+- Quote requests (guest-friendly; email pre-filled when logged in)
+- Protected API: quote history and orders (Bearer JWT)
 - Suggestion chips for common queries
 - Real-time loading states and error handling
 
 ## Tech Stack
 
 - Flutter 3.x (Web + Android + iOS)
+- Supabase Auth (`supabase_flutter`)
 - Provider — state management
 - Dio — HTTP client
 - Google Fonts — typography
@@ -30,12 +34,30 @@ Cross-platform — deployable to web, Android, and iOS.
 
 ```bash
 flutter pub get
-flutter run -d chrome
+flutter run -d chrome \
+  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
 ```
 
-Requires backend running at `localhost:8000`  
-or update `lib/services/api_service.dart` with
-your deployed backend URL.
+Use the **anon** public key from Supabase (never the service role key).
+
+Requires backend at `https://arco-papers-api.onrender.com` or local
+`localhost:8000` (toggle `_baseUrl` in `lib/services/api_service.dart`).
+
+### Supabase dashboard
+
+1. Authentication → Providers → Email → enabled  
+2. Add site URL: `https://arco-papers-app-6b721.web.app` and `http://localhost:*`  
+3. For local dev, you may disable email confirmation or confirm via inbox  
+
+### Firebase deploy
+
+```bash
+flutter build web \
+  --dart-define=SUPABASE_URL=... \
+  --dart-define=SUPABASE_ANON_KEY=...
+firebase deploy --only hosting
+```
 
 ## Structure
 lib/

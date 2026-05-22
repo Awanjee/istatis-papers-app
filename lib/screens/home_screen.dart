@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
@@ -63,6 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => context.read<ChatProvider>().clearMessages(),
               tooltip: 'Clear chat',
             ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () => context.read<AuthProvider>().signOut(),
+            tooltip: 'Log out',
+          ),
         ],
       ),
       body: _screens[_currentIndex],
