@@ -1,53 +1,91 @@
-# arco-papers-api
+# arco-papers-app
 
-Python backend for the Arco Papers AI platform. Built as a real-world vehicle for learning and shipping production-grade AI integration — function calling, multi-step agent pipelines, and stateful LangGraph workflows.
+Flutter client for the Arco Papers AI platform. Web-first UI for staff and customers: AI chat, product catalogue, and quote requests against the Python FastAPI backend.
 
-## What this is
+## What this does
 
-Arco Papers is a family paper manufacturing business in Islamabad, Pakistan. This backend is being built to automate the parts of the business that currently run on phone calls and manual follow-ups — payment reminders, price queries, quotation generation, and order tracking. It is also a deliberate learning project: each layer of the stack is built to production standard, not demo standard.
+- **Sign in / sign up** — Supabase Auth (email/password).
+- **AI assistant** — Chat tab calls `POST /chat` on the deployed API with a per-session `session_id`.
+- **Product catalogue** — Local product data and navigation (`catalogue_screen.dart`).
+- **Request a quote** — Form posts to `POST /quote`; authenticated users can load quote history and create orders via protected endpoints.
 
 ## Stack
 
-- **Python** — FastAPI
-- **AI** — OpenAI API, LangChain, LangGraph
-- **Integrations** — WhatsApp Business API (Meta Cloud API)
-- **Storage** — SQLite (dev), PostgreSQL (prod)
+| Layer | Technology |
+|--------|------------|
+| UI | Flutter (Dart 3.10+) |
+| State | **Provider** + `ChangeNotifier` (`AuthProvider`, `ChatProvider`) |
+| HTTP | Dio |
+| Auth | `supabase_flutter` |
+| Backend | [arco-papers-api](https://github.com/Awanjee/arco-papers-api) on Render |
 
-## What's built
-
-### AI research agent
-A multi-tool agent built in two implementations for direct comparison:
-
-`research_assistant.py` — hand-rolled agent loop with explicit tool dispatch, error handling, and `max_iterations` guard.
-
-`research_assistant_lg.py` — LangGraph implementation using `StateGraph`, `ToolNode`, and `tools_condition`. First trace verified. Streaming via `stream_mode="updates"` in progress.
-
-Tools: `search_web`, `fetch_and_summarise`, `save_note`, `get_saved_notes`.
-
-### Payment reminder system
-Automated WhatsApp follow-up for overdue B2B payments. Three-stage reminder sequence (due date, 7 days overdue, 14 days overdue) using approved Meta message templates. Runs as a scheduled script, logs reminder state per customer to avoid duplicate sends.
-
-## What's in progress
-
-- LangGraph streaming and human-in-the-loop checkpoints
-- Quotation generator
-- WhatsApp price query agent
-- Connecting LangGraph agent to Flutter frontend as an API endpoint
-
-## Structure
+## Project structure
 
 ```
-backend/
-  research_assistant.py       # hand-rolled agent (Level 4 complete)
-  research_assistant_lg.py    # LangGraph agent (Level 5 in progress)
-  payment_reminders.py        # WhatsApp payment follow-up
-  payments.json               # payment records (dev)
-  notes.json                  # agent memory store
-  test_research.py
-  test_whatsapp.py
-  .env.example
+arco_papers_app/lib/
+├── main.dart
+├── config/supabase_config.dart
+├── providers/
+│   ├── auth_provider.dart
+│   └── chat_provider.dart
+├── services/api_service.dart
+├── screens/
+│   ├── home_screen.dart      # Bottom nav: Chat | Catalogue | Quote
+│   ├── catalogue_screen.dart
+│   ├── quote_screen.dart
+│   └── auth/
+├── models/
+├── widgets/
+└── theme/app_theme.dart
 ```
+
+## Prerequisites
+
+- Flutter SDK (see `pubspec.yaml` for Dart `^3.10.8`)
+- Supabase project (same as backend)
+- Running or deployed `arco-papers-api`
+
+## Configuration
+
+Supabase is injected at build/run time (not committed):
+
+```powershell
+flutter run -d chrome `
+  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co `
+  --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
+```
+
+API base URL is in `lib/services/api_service.dart`:
+
+- Production: `https://arco-papers-api.onrender.com`
+- Local: uncomment `http://127.0.0.1:8000` when running Uvicorn locally
+
+Protected routes (`/quotes/history`, `/orders`) send the Supabase access token in the `Authorization: Bearer` header.
+
+## Local run
+
+```powershell
+cd arco_papers_app
+flutter pub get
+flutter run -d chrome --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
+```
+
+For full flows (quote history, orders), run the backend locally or point at Render and ensure `SUPABASE_JWT_SECRET` is set on the API.
+
+## Features by tab
+
+| Tab | Screen | Backend |
+|-----|--------|---------|
+| Chat | `HomeScreen` → chat tab | `POST /chat` |
+| Catalogue | `CatalogueScreen` | Mostly local `products_data.dart` |
+| Quote | `QuoteScreen` | `POST /quote`, `GET /quotes/history`, `POST /orders` |
+
+## Planned / not yet in app
+
+- Dedicated payment-status dashboard
+- WhatsApp message history in UI
+- Public marketing landing at `/` separate from authenticated portal
 
 ## Related
 
-- Frontend: [arco-papers-app](https://github.com/Awanjee/arco-papers-app)
+- Backend: [arco-papers-api](https://github.com/Awanjee/arco-papers-api)
