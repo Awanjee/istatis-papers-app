@@ -1,84 +1,53 @@
-# Arco Papers App
+# arco-papers-api
 
-Flutter web application for the Arco Papers AI platform.
-Cross-platform — deployable to web, Android, and iOS.
+Python backend for the Arco Papers AI platform. Built as a real-world vehicle for learning and shipping production-grade AI integration — function calling, multi-step agent pipelines, and stateful LangGraph workflows.
 
-🌐 **Live:** https://arco-papers-app-6b721.web.app  
-🔗 **Backend:** https://github.com/Awanjee/arco-papers-api
+## What this is
 
-## Demo
+Arco Papers is a family paper manufacturing business in Islamabad, Pakistan. This backend is being built to automate the parts of the business that currently run on phone calls and manual follow-ups — payment reminders, price queries, quotation generation, and order tracking. It is also a deliberate learning project: each layer of the stack is built to production standard, not demo standard.
 
-▶️ [Watch 2-minute demo](https://www.loom.com/share/516dc81b811446ebbfbe28b6fa49836c)
+## Stack
 
----
+- **Python** — FastAPI
+- **AI** — OpenAI API, LangChain, LangGraph
+- **Integrations** — WhatsApp Business API (Meta Cloud API)
+- **Storage** — SQLite (dev), PostgreSQL (prod)
 
-## Features
+## What's built
 
-- Supabase email/password auth (login, signup, auth gate)
-- AI-powered sales assistant with multi-turn memory
-- Product catalogue with category filters and pricing tiers
-- Quote requests (guest-friendly; email pre-filled when logged in)
-- Protected API: quote history and orders (Bearer JWT)
-- Suggestion chips for common queries
-- Real-time loading states and error handling
+### AI research agent
+A multi-tool agent built in two implementations for direct comparison:
 
-## Tech Stack
+`research_assistant.py` — hand-rolled agent loop with explicit tool dispatch, error handling, and `max_iterations` guard.
 
-- Flutter 3.x (Web + Android + iOS)
-- Supabase Auth (`supabase_flutter`)
-- Provider — state management
-- Dio — HTTP client
-- Google Fonts — typography
+`research_assistant_lg.py` — LangGraph implementation using `StateGraph`, `ToolNode`, and `tools_condition`. First trace verified. Streaming via `stream_mode="updates"` in progress.
 
-## Setup
+Tools: `search_web`, `fetch_and_summarise`, `save_note`, `get_saved_notes`.
 
-```bash
-flutter pub get
-flutter run -d chrome \
-  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
-```
+### Payment reminder system
+Automated WhatsApp follow-up for overdue B2B payments. Three-stage reminder sequence (due date, 7 days overdue, 14 days overdue) using approved Meta message templates. Runs as a scheduled script, logs reminder state per customer to avoid duplicate sends.
 
-Use the **anon** public key from Supabase (never the service role key).
+## What's in progress
 
-Requires backend at `https://arco-papers-api.onrender.com` or local
-`localhost:8000` (toggle `_baseUrl` in `lib/services/api_service.dart`).
-
-### Supabase dashboard
-
-1. Authentication → Providers → Email → enabled  
-2. Add site URL: `https://arco-papers-app-6b721.web.app` and `http://localhost:*`  
-3. For local dev, you may disable email confirmation or confirm via inbox  
-
-### Firebase deploy
-
-```bash
-flutter build web \
-  --dart-define=SUPABASE_URL=... \
-  --dart-define=SUPABASE_ANON_KEY=...
-firebase deploy --only hosting
-```
+- LangGraph streaming and human-in-the-loop checkpoints
+- Quotation generator
+- WhatsApp price query agent
+- Connecting LangGraph agent to Flutter frontend as an API endpoint
 
 ## Structure
-lib/
-├── main.dart
-├── models/
-│   ├── message.dart
-│   └── product.dart
-├── data/
-│   └── products_data.dart
-├── services/
-│   └── api_service.dart
-├── providers/
-│   └── chat_provider.dart
-├── screens/
-│   ├── home_screen.dart
-│   └── catalogue_screen.dart
-└── widgets/
-├── chat_bubble.dart
-├── chat_input.dart
-└── suggestion_chips.dart
 
-## Author
+```
+backend/
+  research_assistant.py       # hand-rolled agent (Level 4 complete)
+  research_assistant_lg.py    # LangGraph agent (Level 5 in progress)
+  payment_reminders.py        # WhatsApp payment follow-up
+  payments.json               # payment records (dev)
+  notes.json                  # agent memory store
+  test_research.py
+  test_whatsapp.py
+  .env.example
+```
 
-**Muhammad Usama Awan** — github.com/Awanjee
+## Related
+
+- Frontend: [arco-papers-app](https://github.com/Awanjee/arco-papers-app)
