@@ -8,3 +8,13 @@ class SupabaseConfig {
 
   static bool get isConfigured => url.isNotEmpty && anonKey.isNotEmpty;
 }
+
+/// Backend API base URL.
+/// Override at build time: --dart-define=API_URL=https://your-deployment.onrender.com
+class ApiConfig {
+  static const String baseUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: 'http://127.0.0.1:8000', // local dev default
+    // Production: 'https://arco-papers-api.onrender.com'
+  );
+}

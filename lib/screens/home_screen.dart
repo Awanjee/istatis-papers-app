@@ -7,7 +7,9 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/suggestion_chips.dart';
 import 'catalogue_screen.dart';
+import 'import_document_screen.dart';
 import 'quote_screen.dart';
+import 'transaction_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,10 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final _scrollController = ScrollController();
 
-  final List<Widget> _screens = const [
+  List<Widget> get _screens => const [
     _ChatTab(),
     CatalogueScreen(),
     QuoteScreen(),
+    ImportDocumentScreen(),
+    TransactionHistoryScreen(),
   ];
 
   @override
@@ -40,7 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? 'Arco Papers Assistant'
                   : _currentIndex == 1
                   ? 'Product Catalogue'
-                  : 'Request a Quote',
+                  : _currentIndex == 2
+                  ? 'Request a Quote'
+                  : _currentIndex == 3
+                  ? 'Import Document'
+                  : 'Ledger',
               style: GoogleFonts.inter(
                 color: Colors.white,
                 fontSize: 16,
@@ -52,7 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? 'Ask about products, pricing & orders'
                   : _currentIndex == 1
                   ? 'Envelopes, Paper & File Carriers'
-                  : 'Get a personalised quote by email',
+                  : _currentIndex == 2
+                  ? 'Get a personalised quote by email'
+                  : _currentIndex == 3
+                  ? 'Receipts, khata pages & invoices'
+                  : 'Confirmed transactions',
               style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
             ),
           ],
@@ -75,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF1a472a),
         unselectedItemColor: Colors.grey,
         items: const [
@@ -92,6 +105,16 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.request_quote_outlined),
             activeIcon: Icon(Icons.request_quote),
             label: 'Quote',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.document_scanner_outlined),
+            activeIcon: Icon(Icons.document_scanner),
+            label: 'Import',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
+            label: 'Ledger',
           ),
         ],
       ),
