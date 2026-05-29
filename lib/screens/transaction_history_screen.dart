@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../config/supabase_config.dart';
 import '../services/extraction_service.dart';
+import 'party_balances_screen.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
@@ -13,13 +14,16 @@ class TransactionHistoryScreen extends StatefulWidget {
       _TransactionHistoryScreenState();
 }
 
-class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
+class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   late final ExtractionService _service;
   late Future<List<TransactionSummary>> _future;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     final dio = Dio(BaseOptions(
       baseUrl: ApiConfig.baseUrl,
       connectTimeout: const Duration(seconds: 30),
@@ -27,6 +31,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     ));
     _service = ExtractionService(dio);
     _future = _service.getTransactions();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _refresh() {
@@ -37,23 +47,69 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Tab bar
+        Container(
+          color: Colors.white,
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: const Color(0xFF0B5E72),
+            labelColor: const Color(0xFF0B5E72),
+            unselectedLabelColor: Colors.grey[500],
+            labelStyle: GoogleFonts.inter(
+                fontSize: 13, fontWeight: FontWeight.w600),
+            unselectedLabelStyle:
+                GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+            tabs: const [
+              Tab(text: 'Transactions'),
+              Tab(text: 'Parties'),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _TransactionsTab(future: _future, onRefresh: _refresh),
+              const PartyBalancesScreen(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Transactions tab (extracted from original body)
+// ---------------------------------------------------------------------------
+
+class _TransactionsTab extends StatelessWidget {
+  final Future<List<TransactionSummary>> future;
+  final VoidCallback onRefresh;
+
+  const _TransactionsTab({required this.future, required this.onRefresh});
+
+  @override
+  Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: const Color(0xFF1a472a),
-      onRefresh: () async => _refresh(),
+      color: const Color(0xFF0B5E72),
+      onRefresh: () async => onRefresh(),
       child: FutureBuilder<List<TransactionSummary>>(
-        future: _future,
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF1a472a)),
+              child: CircularProgressIndicator(color: Color(0xFF0B5E72)),
             );
           }
           if (snapshot.hasError) {
-            return _buildError(snapshot.error.toString());
+            return _buildError(context);
           }
           final transactions = snapshot.data ?? [];
           if (transactions.isEmpty) {
-            return _buildEmpty();
+            return _buildEmpty(context);
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -67,7 +123,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     );
   }
 
-  Widget _buildEmpty() {
+  Widget _buildEmpty(BuildContext context) {
     return ListView(
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
@@ -96,7 +152,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     );
   }
 
-  Widget _buildError(String error) {
+  Widget _buildError(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -112,7 +168,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: _refresh,
+              onPressed: onRefresh,
               child: const Text('Retry'),
             ),
           ],

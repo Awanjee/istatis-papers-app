@@ -36,12 +36,14 @@ class ExtractionService {
     String? editedDate,
     double? editedTotal,
     String? notes,
+    String transactionType = 'sale',
   }) async {
     final payload = {
       'party_name': editedPartyName ?? result.partyName,
       'party_name_urdu': result.partyNameUrdu,
       'transaction_date': editedDate ?? result.date,
       'document_type': result.documentType,
+      'transaction_type': transactionType,
       'total_amount': editedTotal ?? result.totals.grandTotal,
       'line_items': result.lineItems.map((i) => i.toJson()).toList(),
       if (notes != null && notes.isNotEmpty) 'notes': notes,
@@ -59,19 +61,65 @@ class ExtractionService {
     await _dio.post<void>('/extract/$extractionId/reject');
   }
 
-  /// Fetch confirmed transactions, newest first.
-  Future<List<TransactionSummary>> getTransactions() async {
-    final response = await _dio.get<List<dynamic>>('/extract/transactions');
+  /// Fetch confirmed transactions, newest first. Optional partyId filter.
+  Future<List<TransactionSummary>> getTransactions({String? partyId}) async {
+    final response = await _dio.get<List<dynamic>>(
+      '/extract/transactions',
+      queryParameters: partyId != null ? {'party_id': partyId} : null,
+    );
     return (response.data ?? [])
         .map((e) => TransactionSummary.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Per-party running balances, sorted by outstanding amount descending.
+  Future<List<PartyBalance>> getPartyBalances() async {
+    final response =
+        await _dio.get<List<dynamic>>('/extract/parties/balances');
+    return (response.data ?? [])
+        .map((e) => PartyBalance.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+}
+
+class PartyBalance {
+  final String partyId;
+  final String? nameRoman;
+  final String? nameUrdu;
+  final double balance;
+  final double totalSales;
+  final double totalPayments;
+  final int transactionCount;
+  final String? lastTransactionDate;
+
+  PartyBalance({
+    required this.partyId,
+    this.nameRoman,
+    this.nameUrdu,
+    required this.balance,
+    required this.totalSales,
+    required this.totalPayments,
+    required this.transactionCount,
+    this.lastTransactionDate,
+  });
+
+  factory PartyBalance.fromJson(Map<String, dynamic> j) => PartyBalance(
+        partyId: j['party_id'] as String,
+        nameRoman: j['name_roman'] as String?,
+        nameUrdu: j['name_urdu'] as String?,
+        balance: (j['balance'] as num?)?.toDouble() ?? 0.0,
+        totalSales: (j['total_sales'] as num?)?.toDouble() ?? 0.0,
+        totalPayments: (j['total_payments'] as num?)?.toDouble() ?? 0.0,
+        transactionCount: (j['transaction_count'] as num?)?.toInt() ?? 0,
+        lastTransactionDate: j['last_transaction_date'] as String?,
+      );
 }
 
 class TransactionSummary {
   final String id;
   final String? transactionDate;
   final String? documentType;
+  final String? transactionType;
   final double? totalAmount;
   final String? notes;
   final String? partyNameRoman;
@@ -82,6 +130,7 @@ class TransactionSummary {
     required this.id,
     this.transactionDate,
     this.documentType,
+    this.transactionType,
     this.totalAmount,
     this.notes,
     this.partyNameRoman,
@@ -95,6 +144,7 @@ class TransactionSummary {
       id: j['id'] as String,
       transactionDate: j['transaction_date'] as String?,
       documentType: j['document_type'] as String?,
+      transactionType: j['transaction_type'] as String?,
       totalAmount: (j['total_amount'] as num?)?.toDouble(),
       notes: j['notes'] as String?,
       partyNameRoman: party?['name_roman'] as String?,

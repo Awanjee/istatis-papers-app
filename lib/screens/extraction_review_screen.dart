@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/extraction_result.dart';
 import '../services/extraction_service.dart';
@@ -25,6 +27,15 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
 
   bool _saving = false;
   String? _saveError;
+  late String _transactionType;
+
+  static const _txTypeDefaults = {
+    'sales_slip': 'sale',
+    'account_ledger': 'sale',
+    'distribution_record': 'sale',
+    'price_list': 'sale',
+    'calculation_note': 'sale',
+  };
 
   @override
   void initState() {
@@ -35,6 +46,8 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     _totalCtrl = TextEditingController(
       text: r.totals.grandTotal?.toStringAsFixed(0) ?? '',
     );
+    _transactionType =
+        _txTypeDefaults[r.documentType] ?? 'sale';
   }
 
   @override
@@ -58,21 +71,70 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
         editedDate:
             _dateCtrl.text.trim().isEmpty ? null : _dateCtrl.text.trim(),
         editedTotal: double.tryParse(_totalCtrl.text.trim()),
+        transactionType: _transactionType,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Transaction saved.'),
-          backgroundColor: Color(0xFF1a472a),
-        ),
-      );
-      Navigator.pop(context); // back to import screen
+
+      // Reset saving state so the screen renders normally before sheet appears
+      setState(() => _saving = false);
+
+      await _showWhatsAppSheet(_buildWhatsAppMessage());
+      if (!mounted) return;
+      Navigator.pop(context);
     } catch (e) {
       setState(() {
         _saving = false;
         _saveError = 'Could not save. Please try again.';
       });
     }
+  }
+
+  String _buildWhatsAppMessage() {
+    final party = _partyCtrl.text.trim();
+
+    final date = _dateCtrl.text.trim().isNotEmpty
+        ? _dateCtrl.text.trim()
+        : 'today';
+    final total = double.tryParse(_totalCtrl.text.trim());
+    final totalStr = total != null
+        ? 'PKR ${total.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}'
+        : '';
+
+    // Build product summary from line items (up to 3)
+    final items = widget.result.lineItems;
+    String productSummary = '';
+    if (items.isNotEmpty) {
+      final lines = items.take(3).map((i) {
+        final code = i.productCode ?? '-';
+        final qty = i.quantity != null ? ' x${i.quantity!.toStringAsFixed(0)}' : '';
+        return '$code$qty';
+      }).join(', ');
+      productSummary = '\nItems: $lines${items.length > 3 ? ' ...' : ''}';
+    }
+
+    final txLabel = {
+      'sale': 'Sale',
+      'payment_received': 'Payment received',
+      'purchase': 'Purchase',
+      'expense': 'Expense',
+    }[_transactionType] ?? 'Transaction';
+
+    final buffer = StringBuffer();
+    buffer.writeln('Arco Papers');
+    buffer.writeln('$txLabel — $date');
+    if (party.isNotEmpty) buffer.writeln('Party: $party');
+    if (totalStr.isNotEmpty) buffer.writeln('Amount: $totalStr');
+    if (productSummary.isNotEmpty) buffer.write(productSummary);
+    return buffer.toString().trim(); // always returns a non-null string
+  }
+
+  Future<void> _showWhatsAppSheet(String message) async {
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => _WhatsAppSheet(initialMessage: message),
+    );
   }
 
   // ------------------------------------------------------------------
@@ -180,6 +242,17 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
                     const TextInputType.numberWithOptions(decimal: true),
               ),
             ],
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Transaction type selector
+        _SectionCard(
+          title: 'Transaction Type',
+          child: _TxTypeSelector(
+            value: _transactionType,
+            onChanged: (v) => setState(() => _transactionType = v),
           ),
         ),
 
@@ -339,6 +412,64 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
 // ------------------------------------------------------------------
 // Sub-widgets
 // ------------------------------------------------------------------
+
+class _TxTypeSelector extends StatelessWidget {
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  const _TxTypeSelector({required this.value, required this.onChanged});
+
+  static final _options = [
+    ('sale', 'Sale', Icons.arrow_upward, const Color(0xFF1a472a)),
+    ('payment_received', 'Payment In', Icons.payments_outlined, const Color(0xFF1565C0)),
+    ('purchase', 'Purchase', Icons.arrow_downward, const Color(0xFF6A1B9A)),
+    ('expense', 'Expense', Icons.receipt_outlined, const Color(0xFFE65100)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _options.map((opt) {
+        final (key, label, icon, color) = opt;
+        final selected = value == key;
+        return GestureDetector(
+          onTap: () => onChanged(key),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: selected ? color.withOpacity(0.12) : Colors.grey[100],
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: selected ? color : Colors.grey[300]!,
+                width: selected ? 1.5 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon,
+                    size: 14,
+                    color: selected ? color : Colors.grey[500]),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    color: selected ? color : Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
 
 class _ConfidenceBadge extends StatelessWidget {
   final double confidence;
@@ -590,6 +721,155 @@ class _MiniStat extends StatelessWidget {
     return Text(
       '$label: $value',
       style: GoogleFonts.inter(fontSize: 12, color: Colors.black87),
+    );
+  }
+}
+
+class _WhatsAppSheet extends StatefulWidget {
+  final String initialMessage;
+  const _WhatsAppSheet({required this.initialMessage});
+
+  @override
+  State<_WhatsAppSheet> createState() => _WhatsAppSheetState();
+}
+
+class _WhatsAppSheetState extends State<_WhatsAppSheet> {
+  late final TextEditingController _msgCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _msgCtrl = TextEditingController(text: widget.initialMessage);
+  }
+
+  @override
+  void dispose() {
+    _msgCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _launch() async {
+    final encoded = Uri.encodeComponent(_msgCtrl.text.trim());
+    final uri = Uri.parse('https://wa.me/?text=$encoded');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+    if (mounted) Navigator.pop(context); // close sheet; review screen pops itself after
+  }
+
+  void _copyToClipboard() {
+    Clipboard.setData(ClipboardData(text: _msgCtrl.text.trim()));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Copied to clipboard')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF25D366).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.chat_outlined,
+                      color: Color(0xFF25D366), size: 20),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Send on WhatsApp',
+                        style: GoogleFonts.inter(
+                            fontSize: 15, fontWeight: FontWeight.w700)),
+                    Text('Edit then open WhatsApp',
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: Colors.grey[500])),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Editable message
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: const Color(0xFF25D366).withOpacity(0.3)),
+              ),
+              child: TextField(
+                controller: _msgCtrl,
+                maxLines: 6,
+                style: GoogleFonts.inter(fontSize: 13, color: Colors.black87),
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.all(14),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Buttons
+            Row(
+              children: [
+                IconButton(
+                  onPressed: _copyToClipboard,
+                  icon: const Icon(Icons.copy_outlined),
+                  color: Colors.grey[600],
+                  tooltip: 'Copy',
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.grey[300]!),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text('Skip',
+                        style: GoogleFonts.inter(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton.icon(
+                    onPressed: _launch,
+                    icon: const Icon(Icons.send_outlined, size: 16),
+                    label: Text('Open WhatsApp',
+                        style:
+                            GoogleFonts.inter(fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -18,3 +18,17 @@ class ApiConfig {
     // Production: 'https://arco-papers-api.onrender.com'
   );
 }
+
+/// Dev convenience: pre-fills the login form when running locally.
+/// Pass --dart-define=DEV_EMAIL=you@email.com --dart-define=DEV_PASSWORD=yourpw
+/// Both must be set for auto-fill to activate. Never set in production builds.
+class DevConfig {
+  static const String _email =
+      String.fromEnvironment('DEV_EMAIL', defaultValue: '');
+  static const String _password =
+      String.fromEnvironment('DEV_PASSWORD', defaultValue: '');
+
+  static bool get isActive => _email.isNotEmpty && _password.isNotEmpty;
+  static String get email => _email;
+  static String get password => _password;
+}
