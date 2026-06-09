@@ -8,11 +8,11 @@ import 'widgets/auth_gate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ArcoApp());
+  runApp(const IstatisApp());
 }
 
-class ArcoApp extends StatelessWidget {
-  const ArcoApp({super.key});
+class IstatisApp extends StatelessWidget {
+  const IstatisApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class ArcoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
       child: MaterialApp(
-        title: 'Arco Papers',
+        title: 'iStatis',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         home: const AuthGate(),

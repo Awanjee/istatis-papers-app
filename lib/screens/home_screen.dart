@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               _currentIndex == 0
-                  ? 'Arco Papers Assistant'
+                  ? 'iStatis Assistant'
                   : _currentIndex == 1
                   ? 'Product Catalogue'
                   : _currentIndex == 2
@@ -192,7 +192,7 @@ class _ChatTabState extends State<_ChatTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Arco Papers',
+              'iStatis',
               style: GoogleFonts.inter(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

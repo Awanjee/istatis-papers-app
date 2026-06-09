@@ -1,6 +1,6 @@
-# arco-papers-app
+# istatis-papers-app
 
-Flutter client for the Arco Papers AI platform. Web-first UI for staff and customers: AI chat, product catalogue, and quote requests against the Python FastAPI backend.
+Flutter client for the iStatis AI platform. Web-first UI for staff and customers: AI chat, product catalogue, and quote requests against the Python FastAPI backend.
 
 ## What this does
 
@@ -17,12 +17,12 @@ Flutter client for the Arco Papers AI platform. Web-first UI for staff and custo
 | State | **Provider** + `ChangeNotifier` (`AuthProvider`, `ChatProvider`) |
 | HTTP | Dio |
 | Auth | `supabase_flutter` |
-| Backend | [arco-papers-api](https://github.com/Awanjee/arco-papers-api) on Render |
+| Backend | [istatis-papers-api](https://github.com/Awanjee/istatis-papers-api) on Render |
 
 ## Project structure
 
 ```
-arco_papers_app/lib/
+istatis_app/lib/
 ├── main.dart
 ├── config/supabase_config.dart
 ├── providers/
@@ -43,7 +43,7 @@ arco_papers_app/lib/
 
 - Flutter SDK (see `pubspec.yaml` for Dart `^3.10.8`)
 - Supabase project (same as backend)
-- Running or deployed `arco-papers-api`
+- Running or deployed `istatis-papers-api`
 
 ## Configuration
 
@@ -57,7 +57,7 @@ flutter run -d chrome `
 
 API base URL is in `lib/services/api_service.dart`:
 
-- Production: `https://arco-papers-api.onrender.com`
+- Production: `https://istatis-papers-api.onrender.com`
 - Local: uncomment `http://127.0.0.1:8000` when running Uvicorn locally
 
 Protected routes (`/quotes/history`, `/orders`) send the Supabase access token in the `Authorization: Bearer` header.
@@ -65,7 +65,7 @@ Protected routes (`/quotes/history`, `/orders`) send the Supabase access token i
 ## Local run
 
 ```powershell
-cd arco_papers_app
+cd istatis_app
 flutter pub get
 flutter run -d chrome --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
 ```
@@ -88,4 +88,4 @@ For full flows (quote history, orders), run the backend locally or point at Rend
 
 ## Related
 
-- Backend: [arco-papers-api](https://github.com/Awanjee/arco-papers-api)
+- Backend: [istatis-papers-api](https://github.com/Awanjee/istatis-papers-api)

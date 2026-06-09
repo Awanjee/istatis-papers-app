@@ -173,7 +173,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: _selectedProductName,
+              initialValue: _selectedProductName,
               decoration: _inputDecoration(''),
               hint: Text(
                 'Select a product',

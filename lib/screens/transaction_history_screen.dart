@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../config/supabase_config.dart';
 import '../services/extraction_service.dart';
 import 'party_balances_screen.dart';
+import 'transaction_detail_screen.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
@@ -71,7 +72,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _TransactionsTab(future: _future, onRefresh: _refresh),
+              _TransactionsTab(future: _future, onRefresh: _refresh, service: _service),
               const PartyBalancesScreen(),
             ],
           ),
@@ -88,8 +89,13 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
 class _TransactionsTab extends StatelessWidget {
   final Future<List<TransactionSummary>> future;
   final VoidCallback onRefresh;
+  final ExtractionService service;
 
-  const _TransactionsTab({required this.future, required this.onRefresh});
+  const _TransactionsTab({
+    required this.future,
+    required this.onRefresh,
+    required this.service,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +121,10 @@ class _TransactionsTab extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             itemCount: transactions.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, i) =>
-                _TransactionCard(tx: transactions[i]),
+            itemBuilder: (context, i) => _TransactionCard(
+              tx: transactions[i],
+              service: service,
+            ),
           );
         },
       ),
@@ -184,8 +192,9 @@ class _TransactionsTab extends StatelessWidget {
 
 class _TransactionCard extends StatelessWidget {
   final TransactionSummary tx;
+  final ExtractionService service;
 
-  const _TransactionCard({required this.tx});
+  const _TransactionCard({required this.tx, required this.service});
 
   static const _docTypeLabels = {
     'sales_slip': 'Sales Slip',
@@ -213,7 +222,18 @@ class _TransactionCard extends StatelessWidget {
     final chipColor =
         _docTypeColors[tx.documentType] ?? const Color(0xFF616161);
 
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TransactionDetailScreen(
+            transactionId: tx.id,
+            service: service,
+            initialPartyName: party,
+          ),
+        ),
+      ),
+      child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -309,7 +329,7 @@ class _TransactionCard extends StatelessWidget {
             ),
         ],
       ),
-    );
+    ));  // closes GestureDetector child + GestureDetector
   }
 
   String _formatDate(String? iso) {

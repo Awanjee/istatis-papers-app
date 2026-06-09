@@ -1,4 +1,4 @@
-import 'package:arco_papers_app/screens/quote_screen.dart';
+import 'package:istatis_app/screens/quote_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../data/products_data.dart';

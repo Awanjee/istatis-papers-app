@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Arco Papers (Web)",
+      "name": "iStatis (Web)",
       "request": "launch",
       "type": "dart",
       "device": "chrome",

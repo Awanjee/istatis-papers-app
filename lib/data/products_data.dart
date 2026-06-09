@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../models/product.dart';
 
 // Replace these with real prices when you have them

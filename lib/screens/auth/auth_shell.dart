@@ -97,7 +97,7 @@ class _BrandHeader extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'Arco Papers',
+          'iStatis',
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.w700,

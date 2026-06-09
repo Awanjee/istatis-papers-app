@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../config/supabase_config.dart';
 import '../services/extraction_service.dart';
+import 'transaction_detail_screen.dart';
 
 class PartyBalancesScreen extends StatefulWidget {
   const PartyBalancesScreen({super.key});
@@ -146,7 +147,7 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Expanded(
           child: _SummaryCard(
-            label: 'Owed to Arco',
+            label: 'Owed to iStatis',
             amount: totalOwed,
             color: const Color(0xFF0B5E72),
             icon: Icons.arrow_circle_up_outlined,
@@ -155,7 +156,7 @@ class _SummaryRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: _SummaryCard(
-            label: 'Arco Owes',
+            label: 'iStatis Owes',
             amount: totalOwing,
             color: const Color(0xFFE65100),
             icon: Icons.arrow_circle_down_outlined,
@@ -238,7 +239,7 @@ class _PartyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = party.nameRoman ?? party.nameUrdu ?? 'Unknown';
     final balance = party.balance;
-    final isOwed = balance >= 0; // party owes Arco
+    final isOwed = balance >= 0; // party owes iStatis
     final balanceColor =
         isOwed ? const Color(0xFF0B5E72) : const Color(0xFFE65100);
     final lastDate = _formatDate(party.lastTransactionDate);
@@ -319,7 +320,7 @@ class _PartyCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  isOwed ? 'owes Arco' : 'Arco owes',
+                  isOwed ? 'owes iStatis' : 'iStatis owes',
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     color: balanceColor.withOpacity(0.7),
@@ -439,7 +440,7 @@ class _PartyTransactionHistoryScreenState
             padding: const EdgeInsets.all(16),
             itemCount: txs.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => _PartyTxRow(tx: txs[i]),
+            itemBuilder: (_, i) => _PartyTxRow(tx: txs[i], service: _service),
           );
         },
       ),
@@ -454,7 +455,8 @@ class _PartyTransactionHistoryScreenState
 
 class _PartyTxRow extends StatelessWidget {
   final TransactionSummary tx;
-  const _PartyTxRow({required this.tx});
+  final ExtractionService service;
+  const _PartyTxRow({required this.tx, required this.service});
 
   static const _txTypeColors = {
     'sale': Color(0xFF0B5E72),
@@ -477,7 +479,18 @@ class _PartyTxRow extends StatelessWidget {
     final label = _txTypeLabels[txType] ?? txType;
     final isCredit = txType == 'payment_received';
 
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TransactionDetailScreen(
+            transactionId: tx.id,
+            service: service,
+            initialPartyName: tx.partyNameRoman ?? tx.partyNameUrdu,
+          ),
+        ),
+      ),
+      child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -557,7 +570,7 @@ class _PartyTxRow extends StatelessWidget {
             ),
         ],
       ),
-    );
+    ));  // closes GestureDetector child + GestureDetector
   }
 
   String _formatDate(String? iso) {

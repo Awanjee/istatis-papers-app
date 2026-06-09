@@ -1,4 +1,4 @@
-package com.example.arco_papers_app
+package com.example.istatis_app
 
 import io.flutter.embedding.android.FlutterActivity
 

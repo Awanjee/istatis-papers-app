@@ -120,7 +120,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     }[_transactionType] ?? 'Transaction';
 
     final buffer = StringBuffer();
-    buffer.writeln('Arco Papers');
+    buffer.writeln('iStatis');
     buffer.writeln('$txLabel — $date');
     if (party.isNotEmpty) buffer.writeln('Party: $party');
     if (totalStr.isNotEmpty) buffer.writeln('Amount: $totalStr');
