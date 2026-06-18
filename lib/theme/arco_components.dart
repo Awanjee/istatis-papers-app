@@ -48,6 +48,10 @@ class ArcoButton extends StatelessWidget {
       ArcoButtonSize.lg => AppSpacing.s6,
     };
 
+    // AppText.button defaults to text1; set foreground explicitly per variant.
+    final fg = _foregroundColor(variant);
+    final labelStyle = textStyle.copyWith(color: fg);
+
     final content = loading
         ? SizedBox(
             width: 20,
@@ -61,12 +65,12 @@ class ArcoButton extends StatelessWidget {
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 16),
+                    Icon(icon, size: 16, color: fg),
                     const SizedBox(width: AppSpacing.s2),
-                    Text(label, style: textStyle),
+                    Text(label, style: labelStyle),
                   ],
                 )
-              : Text(label, style: textStyle));
+              : Text(label, style: labelStyle));
 
     final Widget button;
     switch (variant) {
@@ -74,6 +78,8 @@ class ArcoButton extends StatelessWidget {
         button = ElevatedButton(
           onPressed: loading ? null : onPressed,
           style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.accent,
+            foregroundColor: AppColors.accentContrast,
             minimumSize: Size(expand ? double.infinity : 0, height),
             padding: EdgeInsets.symmetric(horizontal: hPad),
             textStyle: textStyle,
@@ -121,6 +127,13 @@ class ArcoButton extends StatelessWidget {
 
     return button;
   }
+
+  Color _foregroundColor(ArcoButtonVariant v) => switch (v) {
+    ArcoButtonVariant.primary => AppColors.accentContrast,
+    ArcoButtonVariant.secondary => AppColors.text1,
+    ArcoButtonVariant.ghost => AppColors.text2,
+    ArcoButtonVariant.danger => AppColors.danger,
+  };
 
   Color _spinnerColor(ArcoButtonVariant v) => switch (v) {
     ArcoButtonVariant.primary => AppColors.accentContrast,
@@ -178,7 +191,7 @@ class ArcoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = selected ? AppColors.accentSoft2 : AppColors.surface2;
     final border = selected ? AppColors.accentBorder : AppColors.border;
-    final color = selected ? AppColors.accent : AppColors.text2;
+    final color = selected ? AppColors.accent : AppColors.text1;
 
     return Material(
       color: Colors.transparent,

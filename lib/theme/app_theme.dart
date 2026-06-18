@@ -29,7 +29,7 @@ class AppColors {
   static const accent = Color(0xFF7DD3FC);
   static const accentHover = Color(0xFFA5E0FD);
   static const accentPress = Color(0xFF5CC2F5);
-  static const accentContrast = Color(0xFF04222E);
+  static const accentContrast = Color(0xFF0A0F12);
 
   // semantic
   static const success = Color(0xFF34D399);
