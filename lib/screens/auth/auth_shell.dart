@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme.dart';
+import '../../theme/arco_components.dart';
 
-/// Meta-style auth layout: brand header + centered white card.
+/// Centered auth layout matching Design System v1 panel + brand.
 class AuthShell extends StatelessWidget {
   const AuthShell({
     super.key,
@@ -21,51 +21,27 @@ class AuthShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.canvas,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.s6,
+              vertical: AppSpacing.s8,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _BrandHeader(),
-                  const SizedBox(height: 32),
-                  Text(
-                    title,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.text1,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      color: AppColors.muted,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Material(
-                    elevation: 1,
-                    shadowColor: Colors.black12,
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.card,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: child,
-                    ),
-                  ),
+                  const _BrandHeader(),
+                  const SizedBox(height: AppSpacing.s8),
+                  ArcoSectionHead(title: title, subtitle: subtitle),
+                  const SizedBox(height: AppSpacing.s6),
+                  ArcoPanel(child: child),
                   if (footer != null) ...[
-                    const SizedBox(height: 20),
-                    footer!,
+                    const SizedBox(height: AppSpacing.s5),
+                    Center(child: footer!),
                   ],
                 ],
               ),
@@ -78,32 +54,17 @@ class AuthShell extends StatelessWidget {
 }
 
 class _BrandHeader extends StatelessWidget {
+  const _BrandHeader();
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.inventory_2_outlined,
-            color: AppColors.text1,
-            size: 36,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'iStatis',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: AppColors.primary,
-          ),
-        ),
+        const ArcoBrandMark(size: 48),
+        const SizedBox(height: AppSpacing.s3),
+        Text('iStatis', style: AppText.h3.copyWith(color: AppColors.accent)),
+        const SizedBox(height: AppSpacing.s1),
+        Text('v1.0 · dark', style: AppText.eyebrow),
       ],
     );
   }

@@ -2,6 +2,7 @@ import '../../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme/arco_components.dart';
 import '../../providers/auth_provider.dart';
 import 'auth_shell.dart';
 
@@ -69,9 +70,10 @@ class _SignupScreenState extends State<SignupScreen> {
     return AuthShell(
       title: 'Create account',
       subtitle: 'Sign up to save quotes and place orders.',
-      footer: TextButton(
+      footer: ArcoButton(
+        label: 'Already have an account? Log in',
+        variant: ArcoButtonVariant.ghost,
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Already have an account? Log in'),
       ),
       child: Form(
         key: _formKey,
@@ -127,9 +129,7 @@ class _SignupScreenState extends State<SignupScreen> {
             TextFormField(
               controller: _confirmController,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confirm password',
-              ),
+              decoration: const InputDecoration(labelText: 'Confirm password'),
               validator: (v) {
                 if (v != _passwordController.text) {
                   return 'Passwords do not match';
@@ -137,19 +137,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
+            const SizedBox(height: AppSpacing.s6),
+            ArcoButton(
+              label: 'Sign up',
+              expand: true,
+              loading: _submitting,
               onPressed: _submitting ? null : _submit,
-              child: _submitting
-                  ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.text1,
-                      ),
-                    )
-                  : const Text('Sign up'),
             ),
           ],
         ),

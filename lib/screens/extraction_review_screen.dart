@@ -1,4 +1,3 @@
-import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/extraction_result.dart';
 import '../services/extraction_service.dart';
+import '../theme/app_theme.dart';
+import '../theme/arco_components.dart';
 
 class ExtractionReviewScreen extends StatefulWidget {
   final ExtractionResult result;
@@ -150,17 +151,9 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
   // Confidence colour helpers
   // ------------------------------------------------------------------
 
-  Color _confColor(double conf) {
-    if (conf >= 0.8) return Colors.green[700]!;
-    if (conf >= 0.6) return Colors.orange[700]!;
-    return AppColors.danger;
-  }
+  Color _confColor(double conf) => AppConfidence.fg(conf);
 
-  Color _confBg(double conf) {
-    if (conf >= 0.8) return Colors.green[50]!;
-    if (conf >= 0.6) return Colors.orange[50]!;
-    return AppColors.dangerSoft;
-  }
+  Color _confBg(double conf) => AppConfidence.bg(conf);
 
   String _docTypeLabel(String? dt) {
     const labels = {
@@ -189,21 +182,8 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Review Extraction',
-              style: GoogleFonts.plusJakartaSans(
-                color: AppColors.text1,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              _docTypeLabel(r.documentType),
-              style: GoogleFonts.plusJakartaSans(
-                color: AppColors.text2,
-                fontSize: 11,
-              ),
-            ),
+            Text('Review Extraction', style: AppText.navTitle),
+            Text(_docTypeLabel(r.documentType), style: AppText.navSubtitle),
           ],
         ),
         actions: [
@@ -214,9 +194,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
         ],
       ),
       body: _saving
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : _buildBody(r),
       bottomNavigationBar: _saving ? null : _buildBottomBar(),
     );
@@ -224,10 +202,17 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
 
   Widget _buildBody(ExtractionResult r) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.s4),
       children: [
         // Warning banner
-        if (r.hasWarnings) _buildWarningBanner(r),
+        if (r.hasWarnings)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+            child: ArcoAlert(
+              variant: ArcoAlertVariant.warning,
+              message: _warningMessage(r),
+            ),
+          ),
 
         // Header fields
         _SectionCard(
@@ -293,7 +278,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
           _InfoTile(
             icon: Icons.visibility_off_outlined,
             color: AppColors.text2,
-            bg: Colors.grey[100]!,
+            bg: AppColors.surface2,
             text: 'Could not read: ${r.unreadableSections}',
           ),
 
@@ -317,12 +302,10 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
 
         if (_saveError != null)
           Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: _InfoTile(
-              icon: Icons.error_outline,
-              color: AppColors.danger,
-              bg: AppColors.dangerSoft,
-              text: _saveError!,
+            padding: const EdgeInsets.only(top: AppSpacing.s3),
+            child: ArcoAlert(
+              variant: ArcoAlertVariant.danger,
+              message: _saveError!,
             ),
           ),
 
@@ -331,91 +314,47 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     );
   }
 
-  Widget _buildWarningBanner(ExtractionResult r) {
+  String _warningMessage(ExtractionResult r) {
     final fields = r.lowConfidenceFields;
     final hasUnread =
         r.unreadableSections != null && r.unreadableSections!.isNotEmpty;
 
-    String message = 'Some fields may need review';
     if (fields.isNotEmpty) {
-      message = 'Low confidence: ${fields.take(3).join(", ")}';
+      var message = 'Low confidence: ${fields.take(3).join(", ")}';
       if (fields.length > 3) message += ' +${fields.length - 3} more';
-    } else if (hasUnread) {
-      message = 'Some sections could not be read';
+      return message;
     }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.amber[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber[300]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.amber[800], size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 13,
-                color: Colors.amber[900],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    if (hasUnread) return 'Some sections could not be read';
+    return 'Some fields may need review';
   }
 
   Widget _buildBottomBar() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.s4,
+          AppSpacing.s2,
+          AppSpacing.s4,
+          AppSpacing.s4,
+        ),
         child: Row(
           children: [
             Expanded(
-              child: OutlinedButton(
+              child: ArcoButton(
+                label: 'Discard',
+                variant: ArcoButtonVariant.ghost,
+                expand: true,
                 onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.text3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Discard',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppColors.text2,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.s3),
             Expanded(
               flex: 2,
-              child: ElevatedButton(
+              child: ArcoButton(
+                label: 'Confirm & save',
+                expand: true,
+                loading: _saving,
                 onPressed: _confirm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.accentContrast,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Confirm & Save',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
-                ),
               ),
             ),
           ],
@@ -455,35 +394,10 @@ class _TxTypeSelector extends StatelessWidget {
       children: _options.map((opt) {
         final (key, label, icon, color) = opt;
         final selected = value == key;
-        return GestureDetector(
+        return ArcoChip(
+          label: label,
+          selected: selected,
           onTap: () => onChanged(key),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: selected ? color.withOpacity(0.12) : Colors.grey[100],
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected ? color : AppColors.border,
-                width: selected ? 1.5 : 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 14, color: selected ? color : AppColors.text3),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    color: selected ? color : AppColors.text3,
-                  ),
-                ),
-              ],
-            ),
-          ),
         );
       }).toList(),
     );
@@ -497,29 +411,19 @@ class _ConfidenceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = (confidence * 100).round();
-    Color bg;
-    if (confidence >= 0.8) {
-      bg = Colors.green[700]!;
-    } else if (confidence >= 0.6) {
-      bg = Colors.orange[700]!;
-    } else {
-      bg = AppColors.danger;
-    }
+    final bg = AppConfidence.fg(confidence);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s3,
+        vertical: AppSpacing.s1,
+      ),
       decoration: BoxDecoration(
-        color: bg.withOpacity(0.85),
-        borderRadius: BorderRadius.circular(20),
+        color: bg.withOpacity(0.2),
+        borderRadius: AppRadius.rPill,
+        border: Border.all(color: bg.withOpacity(0.4)),
       ),
-      child: Text(
-        '$pct%',
-        style: GoogleFonts.plusJakartaSans(
-          color: AppColors.text1,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      child: Text('$pct%', style: AppText.chip.copyWith(color: bg)),
     );
   }
 }
@@ -532,31 +436,13 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.text1,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
+      decoration: AppDecorations.card(),
+      padding: const EdgeInsets.all(AppSpacing.s4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppColors.text3,
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(height: 12),
+          Text(title, style: AppText.overline),
+          const SizedBox(height: AppSpacing.s3),
           child,
         ],
       ),
@@ -584,48 +470,18 @@ class _EditField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.text2,
-          ),
-        ),
-        const SizedBox(height: 6),
+        Text(label, style: AppText.label),
+        const SizedBox(height: AppSpacing.s2),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
-          style: GoogleFonts.plusJakartaSans(fontSize: 14),
+          style: AppText.body.copyWith(fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.plusJakartaSans(
-              fontSize: 14,
-              color: AppColors.text3,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
-            ),
             suffix: urduHint != null
                 ? Text(
                     urduHint!,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      color: AppColors.text3,
-                    ),
+                    style: AppText.caption,
                     textDirection: TextDirection.rtl,
                   )
                 : null,
@@ -672,21 +528,11 @@ class _LineItemTile extends StatelessWidget {
               children: [
                 Text(
                   code,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.text1,
-                  ),
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w600),
                 ),
                 if (desc != null && desc.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text(
-                    desc,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      color: AppColors.text3,
-                    ),
-                  ),
+                  Text(desc, style: AppText.caption),
                 ],
                 const SizedBox(height: 6),
                 Wrap(
@@ -709,9 +555,7 @@ class _LineItemTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     item.notes!,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      color: AppColors.text3,
+                    style: AppText.caption.copyWith(
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -727,11 +571,7 @@ class _LineItemTile extends StatelessWidget {
             ),
             child: Text(
               '$pct%',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: confColor,
-              ),
+              style: AppText.chip.copyWith(color: confColor),
             ),
           ),
         ],
@@ -747,10 +587,7 @@ class _MiniStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      '$label: $value',
-      style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.text1),
-    );
+    return Text('$label: $value', style: AppText.caption);
   }
 }
 
@@ -783,8 +620,9 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
-    if (mounted)
-      Navigator.pop(context); // close sheet; review screen pops itself after
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   void _copyToClipboard() {
@@ -825,18 +663,9 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                   children: [
                     Text(
                       'Send on WhatsApp',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: AppText.body.copyWith(fontWeight: FontWeight.w700),
                     ),
-                    Text(
-                      'Edit then open WhatsApp',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        color: AppColors.text3,
-                      ),
-                    ),
+                    Text('Edit then open WhatsApp', style: AppText.caption),
                   ],
                 ),
               ],
@@ -853,10 +682,7 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
               child: TextField(
                 controller: _msgCtrl,
                 maxLines: 6,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13,
-                  color: AppColors.text1,
-                ),
+                style: AppText.small,
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.all(14),
                   border: InputBorder.none,
@@ -885,13 +711,7 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text(
-                      'Skip',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: AppColors.text3,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Text('Skip'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -900,12 +720,7 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                   child: ElevatedButton.icon(
                     onPressed: _launch,
                     icon: const Icon(Icons.send_outlined, size: 16),
-                    label: Text(
-                      'Open WhatsApp',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    label: const Text('Open WhatsApp'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.success,
                       foregroundColor: AppColors.accentContrast,
@@ -953,10 +768,7 @@ class _InfoTile extends StatelessWidget {
           Icon(icon, color: color, size: 18),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: color),
-            ),
+            child: Text(text, style: AppText.small.copyWith(color: color)),
           ),
         ],
       ),

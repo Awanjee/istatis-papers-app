@@ -1,7 +1,7 @@
-import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import '../models/message.dart';
+import '../theme/app_theme.dart';
 
 class ChatBubble extends StatelessWidget {
   final Message message;
@@ -15,26 +15,31 @@ class ChatBubble extends StatelessWidget {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(
+            vertical: AppSpacing.s1, horizontal: AppSpacing.s3),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s4, vertical: AppSpacing.s3),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
           color: isUser ? AppColors.accent : AppColors.surface2,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
+            topLeft: const Radius.circular(AppRadius.xl),
+            topRight: const Radius.circular(AppRadius.xl),
+            bottomLeft: Radius.circular(isUser ? AppRadius.xl : AppRadius.xs),
+            bottomRight: Radius.circular(isUser ? AppRadius.xs : AppRadius.xl),
           ),
+          border: isUser
+              ? null
+              : Border.all(color: AppColors.borderSubtle),
         ),
         child: Text(
           message.content,
-          style: GoogleFonts.plusJakartaSans(
-            color: isUser ? AppColors.text1 : AppColors.text1,
+          style: AppText.body.copyWith(
             fontSize: 14,
             height: 1.5,
+            color: isUser ? AppColors.accentContrast : AppColors.text1,
           ),
         ),
       ),

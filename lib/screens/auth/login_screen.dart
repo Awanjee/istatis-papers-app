@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../config/supabase_config.dart';
+import '../../theme/arco_components.dart';
 import '../../providers/auth_provider.dart';
 import 'auth_shell.dart';
 import 'signup_screen.dart';
@@ -60,13 +61,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return AuthShell(
       title: 'Log in',
       subtitle: 'Access your quotes, catalogue, and assistant.',
-      footer: TextButton(
+      footer: ArcoButton(
+        label: 'Create new account',
+        variant: ArcoButtonVariant.ghost,
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const SignupScreen()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const SignupScreen()));
         },
-        child: const Text('Create new account'),
       ),
       child: Form(
         key: _formKey,
@@ -108,19 +110,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
+            const SizedBox(height: AppSpacing.s6),
+            ArcoButton(
+              label: 'Log in',
+              expand: true,
+              loading: _submitting,
               onPressed: _submitting ? null : _submit,
-              child: _submitting
-                  ? const SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.text1,
-                      ),
-                    )
-                  : const Text('Log in'),
             ),
           ],
         ),

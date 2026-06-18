@@ -1,6 +1,7 @@
-import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/app_theme.dart';
+import '../theme/arco_components.dart';
 
 class ChatInput extends StatefulWidget {
   final Function(String) onSend;
@@ -31,9 +32,9 @@ class _ChatInputState extends State<ChatInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.text1,
+      padding: const EdgeInsets.all(AppSpacing.s4),
+      decoration: const BoxDecoration(
+        color: AppColors.surface1,
         border: Border(top: BorderSide(color: AppColors.borderSubtle)),
       ),
       child: Row(
@@ -42,44 +43,26 @@ class _ChatInputState extends State<ChatInput> {
             child: TextField(
               controller: _controller,
               onSubmitted: (_) => _send(),
-              decoration: InputDecoration(
+              style: AppText.body.copyWith(fontSize: 14),
+              decoration: const InputDecoration(
                 hintText: 'Ask about products or pricing...',
-                hintStyle: GoogleFonts.plusJakartaSans(color: AppColors.text3, fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: const BorderSide(color: AppColors.accent),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          Container(
-            decoration: const BoxDecoration(
-              color: AppColors.accent,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              onPressed: widget.isLoading ? null : _send,
-              icon: widget.isLoading
-                  ? const SizedBox(
+          const SizedBox(width: AppSpacing.s2),
+          widget.isLoading
+              ? const SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: Center(
+                    child: SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.text1,
-                      ),
-                    )
-                  : const Icon(Icons.send, color: AppColors.text1),
-            ),
-          ),
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                )
+              : ArcoIconButton(icon: Icons.send_outlined, onPressed: _send),
         ],
       ),
     );

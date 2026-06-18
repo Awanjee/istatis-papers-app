@@ -1,10 +1,10 @@
-import '../theme/app_theme.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../config/supabase_config.dart';
 import '../services/extraction_service.dart';
+import '../theme/app_theme.dart';
+import '../theme/arco_components.dart';
 import 'transaction_detail_screen.dart';
 
 class PartyBalancesScreen extends StatefulWidget {
@@ -21,11 +21,13 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
   @override
   void initState() {
     super.initState();
-    final dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    );
     _service = ExtractionService(dio);
     _future = _service.getPartyBalances();
   }
@@ -35,40 +37,45 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: AppColors.accent,
       onRefresh: () async => _refresh(),
       child: FutureBuilder<List<PartyBalance>>(
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
-          if (snap.hasError) {
-            return _buildError();
-          }
+          if (snap.hasError) return _buildError();
           final parties = snap.data ?? [];
           if (parties.isEmpty) return _buildEmpty();
 
-          // Summary totals at the top
-          final totalOwed =
-              parties.fold(0.0, (s, p) => s + (p.balance > 0 ? p.balance : 0));
-          final totalOwing =
-              parties.fold(0.0, (s, p) => s + (p.balance < 0 ? p.balance.abs() : 0));
+          final totalOwed = parties.fold(
+            0.0,
+            (s, p) => s + (p.balance > 0 ? p.balance : 0),
+          );
+          final totalOwing = parties.fold(
+            0.0,
+            (s, p) => s + (p.balance < 0 ? p.balance.abs() : 0),
+          );
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.s4,
+              AppSpacing.s4,
+              AppSpacing.s4,
+              AppSpacing.s6,
+            ),
             children: [
               _SummaryRow(totalOwed: totalOwed, totalOwing: totalOwing),
-              const SizedBox(height: 16),
-              ...parties.map((p) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _PartyCard(
-                      party: p,
-                      onTap: () => _openPartyTransactions(p),
-                    ),
-                  )),
+              const SizedBox(height: AppSpacing.s4),
+              ...parties.map(
+                (p) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+                  child: _PartyCard(
+                    party: p,
+                    onTap: () => _openPartyTransactions(p),
+                  ),
+                ),
+              ),
             ],
           );
         },
@@ -91,21 +98,20 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
         Column(
           children: [
-            Icon(Icons.people_outline, size: 64, color: AppColors.text3),
-            const SizedBox(height: 16),
+            const Icon(Icons.people_outline, size: 64, color: AppColors.text3),
+            const SizedBox(height: AppSpacing.s4),
             Text(
               'No parties yet',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
+              style: AppText.bodyLg.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.text3,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.s2),
             Text(
               'Confirm a transaction to see\nparty balances here.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.text3),
+              style: AppText.small.copyWith(color: AppColors.text3),
             ),
           ],
         ),
@@ -118,23 +124,19 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
-          const SizedBox(height: 12),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.danger),
+          const SizedBox(height: AppSpacing.s3),
           Text(
             'Could not load balances',
-            style: GoogleFonts.plusJakartaSans(fontSize: 15, fontWeight: FontWeight.w600),
+            style: AppText.body.copyWith(fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.s2),
           TextButton(onPressed: _refresh, child: const Text('Retry')),
         ],
       ),
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Summary row at top
-// ---------------------------------------------------------------------------
 
 class _SummaryRow extends StatelessWidget {
   final double totalOwed;
@@ -154,7 +156,7 @@ class _SummaryRow extends StatelessWidget {
             icon: Icons.arrow_circle_up_outlined,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.s3),
         Expanded(
           child: _SummaryCard(
             label: 'iStatis Owes',
@@ -184,34 +186,22 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
+      padding: const EdgeInsets.all(AppSpacing.s4),
+      decoration: AppDecorations.semanticTint(color),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(icon, size: 16, color: color),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
+              const SizedBox(width: AppSpacing.s2),
+              Text(label, style: AppText.chip.copyWith(color: color)),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.s2),
           Text(
             'PKR ${_fmt(amount)}',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 16,
+            style: AppText.bodyLg.copyWith(
               fontWeight: FontWeight.w800,
               color: color,
             ),
@@ -223,12 +213,11 @@ class _SummaryCard extends StatelessWidget {
 
   String _fmt(double v) => v
       .toStringAsFixed(0)
-      .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      .replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (m) => '${m[1]},',
+      );
 }
-
-// ---------------------------------------------------------------------------
-// Party card
-// ---------------------------------------------------------------------------
 
 class _PartyCard extends StatelessWidget {
   final PartyBalance party;
@@ -240,81 +229,56 @@ class _PartyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = party.nameRoman ?? party.nameUrdu ?? 'Unknown';
     final balance = party.balance;
-    final isOwed = balance >= 0; // party owes iStatis
-    final balanceColor =
-        isOwed ? AppColors.accent : AppColors.warning;
+    final isOwed = balance >= 0;
+    final balanceColor = isOwed ? AppColors.accent : AppColors.warning;
     final lastDate = _formatDate(party.lastTransactionDate);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.text1,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16),
+        decoration: AppDecorations.card(),
+        padding: const EdgeInsets.all(AppSpacing.s4),
         child: Row(
           children: [
-            // Left accent
             Container(
               width: 4,
               height: 52,
               decoration: BoxDecoration(
                 color: balanceColor,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.rXs,
               ),
             ),
-            const SizedBox(width: 12),
-            // Middle
+            const SizedBox(width: AppSpacing.s3),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     name,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.text1,
-                    ),
+                    style: AppText.body.copyWith(fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.s1),
                   Row(
                     children: [
                       Text(
                         '${party.transactionCount} transactions',
-                        style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12, color: AppColors.text3),
+                        style: AppText.caption,
                       ),
                       if (lastDate != null) ...[
-                        Text('  ·  ',
-                            style: GoogleFonts.plusJakartaSans(color: AppColors.text3)),
-                        Text(
-                          'Last: $lastDate',
-                          style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12, color: AppColors.text3),
-                        ),
+                        Text('  ·  ', style: AppText.caption),
+                        Text('Last: $lastDate', style: AppText.caption),
                       ],
                     ],
                   ),
                 ],
               ),
             ),
-            // Right: balance
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   'PKR ${_fmtAbs(balance)}',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
+                  style: AppText.body.copyWith(
                     fontWeight: FontWeight.w800,
                     color: balanceColor,
                   ),
@@ -322,15 +286,14 @@ class _PartyCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   isOwed ? 'owes iStatis' : 'iStatis owes',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
+                  style: AppText.caption.copyWith(
                     color: balanceColor.withOpacity(0.7),
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 8),
-            Icon(Icons.chevron_right, color: AppColors.text3, size: 20),
+            const SizedBox(width: AppSpacing.s2),
+            const Icon(Icons.chevron_right, color: AppColors.text3, size: 20),
           ],
         ),
       ),
@@ -352,12 +315,11 @@ class _PartyCard extends StatelessWidget {
   String _fmtAbs(double v) => v
       .abs()
       .toStringAsFixed(0)
-      .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      .replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (m) => '${m[1]},',
+      );
 }
-
-// ---------------------------------------------------------------------------
-// Party-filtered transaction history screen (pushed on tap)
-// ---------------------------------------------------------------------------
 
 class PartyTransactionHistoryScreen extends StatefulWidget {
   final PartyBalance party;
@@ -377,46 +339,30 @@ class _PartyTransactionHistoryScreenState
   @override
   void initState() {
     super.initState();
-    final dio = Dio(BaseOptions(
-      baseUrl: ApiConfig.baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConfig.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    );
     _service = ExtractionService(dio);
     _future = _service.getTransactions(partyId: widget.party.partyId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final name =
-        widget.party.nameRoman ?? widget.party.nameUrdu ?? 'Unknown';
+    final name = widget.party.nameRoman ?? widget.party.nameUrdu ?? 'Unknown';
     final balance = widget.party.balance;
     final isOwed = balance >= 0;
-    final balanceColor =
-        isOwed ? AppColors.accent : AppColors.warning;
+    final balanceColor = isOwed ? AppColors.accent : AppColors.warning;
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface1,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              name,
-              style: GoogleFonts.plusJakartaSans(
-                color: AppColors.text1,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '${isOwed ? "Owes" : "Owed"} PKR ${_fmtAbs(balance)}',
-              style: GoogleFonts.plusJakartaSans(color: AppColors.text2, fontSize: 11),
-            ),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: AppColors.text1),
+      appBar: ArcoTopBar(
+        title: name,
+        subtitle: '${isOwed ? "Owes" : "Owed"} PKR ${_fmtAbs(balance)}',
+        showBrand: false,
       ),
       body: FutureBuilder<List<TransactionSummary>>(
         future: _future,
@@ -428,19 +374,25 @@ class _PartyTransactionHistoryScreenState
           }
           if (snap.hasError) {
             return Center(
-              child: Text('Could not load.',
-                  style: GoogleFonts.plusJakartaSans(color: AppColors.text3)));
+              child: Text(
+                'Could not load.',
+                style: AppText.small.copyWith(color: AppColors.text3),
+              ),
+            );
           }
           final txs = snap.data ?? [];
           if (txs.isEmpty) {
             return Center(
-              child: Text('No transactions found.',
-                  style: GoogleFonts.plusJakartaSans(color: AppColors.text3)));
+              child: Text(
+                'No transactions found.',
+                style: AppText.small.copyWith(color: AppColors.text3),
+              ),
+            );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.s4),
             itemCount: txs.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.s3),
             itemBuilder: (_, i) => _PartyTxRow(tx: txs[i], service: _service),
           );
         },
@@ -451,7 +403,10 @@ class _PartyTransactionHistoryScreenState
   String _fmtAbs(double v) => v
       .abs()
       .toStringAsFixed(0)
-      .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      .replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (m) => '${m[1]},',
+      );
 }
 
 class _PartyTxRow extends StatelessWidget {
@@ -461,8 +416,8 @@ class _PartyTxRow extends StatelessWidget {
 
   static const _txTypeColors = {
     'sale': AppColors.accent,
-    'payment_received': AppColors.accent,
-    'purchase': AppColors.accent,
+    'payment_received': AppColors.success,
+    'purchase': AppColors.warning,
     'expense': AppColors.warning,
   };
 
@@ -492,86 +447,62 @@ class _PartyTxRow extends StatelessWidget {
         ),
       ),
       child: Container(
-      decoration: BoxDecoration(
-        color: AppColors.text1,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        label,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: color,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _formatDate(tx.transactionDate),
-                      style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12, color: AppColors.text3),
-                    ),
-                  ],
-                ),
-                if (tx.notes != null && tx.notes!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    tx.notes!,
-                    style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        color: AppColors.text3,
-                        fontStyle: FontStyle.italic),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (tx.totalAmount != null)
-            Text(
-              '${isCredit ? "-" : "+"}PKR ${_fmt(tx.totalAmount!)}',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: isCredit ? AppColors.accent : AppColors.accent,
+        decoration: AppDecorations.card(),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s4,
+          vertical: AppSpacing.s4,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: AppRadius.rXs,
               ),
             ),
-        ],
+            const SizedBox(width: AppSpacing.s3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _TypeChip(label: label, color: color),
+                      const SizedBox(width: AppSpacing.s2),
+                      Text(
+                        _formatDate(tx.transactionDate),
+                        style: AppText.caption,
+                      ),
+                    ],
+                  ),
+                  if (tx.notes != null && tx.notes!.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.s1),
+                    Text(
+                      tx.notes!,
+                      style: AppText.caption.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (tx.totalAmount != null)
+              Text(
+                '${isCredit ? "-" : "+"}PKR ${_fmt(tx.totalAmount!)}',
+                style: AppText.body.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isCredit ? AppColors.success : AppColors.accent,
+                ),
+              ),
+          ],
+        ),
       ),
-    ));  // closes GestureDetector child + GestureDetector
+    );
   }
 
   String _formatDate(String? iso) {
@@ -588,5 +519,30 @@ class _PartyTxRow extends StatelessWidget {
 
   String _fmt(double v) => v
       .toStringAsFixed(0)
-      .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      .replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (m) => '${m[1]},',
+      );
+}
+
+class _TypeChip extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _TypeChip({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s2,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: AppRadius.rPill,
+      ),
+      child: Text(label, style: AppText.chip.copyWith(color: color)),
+    );
+  }
 }

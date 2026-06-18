@@ -1,11 +1,12 @@
-import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
 import '../models/quote_request.dart';
 import '../models/product.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
+import '../theme/arco_components.dart';
 
 class QuoteScreen extends StatefulWidget {
   final Product? preselectedProduct;
@@ -29,8 +30,6 @@ class _QuoteScreenState extends State<QuoteScreen> {
   bool _submitted = false;
   String _resultMessage = '';
   String _quoteSummary = '';
-
-  // Product type dropdown
   String? _selectedProductName;
 
   static const _productOptions = [
@@ -105,154 +104,101 @@ class _QuoteScreenState extends State<QuoteScreen> {
 
   Widget _buildForm() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.s5),
       child: Form(
         key: _formKey,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Get a Quote',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppColors.accent,
-              ),
+            const ArcoSectionHead(
+              eyebrow: 'Quote',
+              title: 'Get a quote',
+              subtitle:
+                  'Fill in your details and we\'ll email you a personalised quote.',
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Fill in your details and we\'ll email '
-              'you a personalised quote.',
-              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.text3),
-            ),
-            const SizedBox(height: 20),
-
-            // Name
-            _buildField(
-              controller: _nameController,
-              label: 'Your Name',
-              hint: 'Muhammad Ali',
-              validator: (v) => v!.isEmpty ? 'Name is required' : null,
-            ),
-            const SizedBox(height: 14),
-
-            // Company
-            _buildField(
-              controller: _companyController,
-              label: 'Company / Organisation',
-              hint: 'Islamabad Diagnostic Center',
-              validator: (v) => v!.isEmpty ? 'Company is required' : null,
-            ),
-            const SizedBox(height: 14),
-
-            // Email
-            _buildField(
-              controller: _emailController,
-              label: 'Email Address',
-              hint: 'you@company.com',
-              keyboardType: TextInputType.emailAddress,
-              validator: (v) {
-                if (v!.isEmpty) {
-                  return 'Email is required';
-                }
-                if (!v.contains('@')) {
-                  return 'Enter a valid email';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 14),
-
-            // Product dropdown
-            Text(
-              'Product',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.text1,
-              ),
-            ),
-            const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedProductName,
-              decoration: _inputDecoration(''),
-              hint: Text(
-                'Select a product',
-                style: GoogleFonts.plusJakartaSans(color: AppColors.text3, fontSize: 13),
-              ),
-              items: _productOptions
-                  .map(
-                    (p) => DropdownMenuItem(
-                      value: p.$1,
-                      child: Text(p.$2, style: GoogleFonts.plusJakartaSans(fontSize: 13)),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (val) => setState(() => _selectedProductName = val),
-            ),
-            const SizedBox(height: 14),
-
-            // Quantity
-            _buildField(
-              controller: _quantityController,
-              label: 'Quantity',
-              hint: '5000',
-              keyboardType: TextInputType.number,
-              validator: (v) {
-                if (v!.isEmpty) {
-                  return 'Quantity is required';
-                }
-                final n = int.tryParse(v);
-                if (n == null || n <= 0) {
-                  return 'Enter a valid quantity';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 14),
-
-            // Notes
-            _buildField(
-              controller: _notesController,
-              label: 'Additional Notes (optional)',
-              hint:
-                  'Delivery to Lahore, custom '
-                  'printing required...',
-              maxLines: 3,
-              validator: (_) => null,
-            ),
-            const SizedBox(height: 24),
-
-            // Submit button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _submitQuote,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
-                  foregroundColor: AppColors.accentContrast,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+            const SizedBox(height: AppSpacing.s6),
+            ArcoPanel(
+              child: Column(
+                children: [
+                  _buildField(
+                    controller: _nameController,
+                    label: 'Your name',
+                    hint: 'Muhammad Ali',
+                    validator: (v) => v!.isEmpty ? 'Name is required' : null,
                   ),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.text1,
-                        ),
-                      )
-                    : Text(
-                        'Request Quote',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                        ),
-                      ),
+                  const SizedBox(height: AppSpacing.s4),
+                  _buildField(
+                    controller: _companyController,
+                    label: 'Company / organisation',
+                    hint: 'Islamabad Diagnostic Center',
+                    validator: (v) => v!.isEmpty ? 'Company is required' : null,
+                  ),
+                  const SizedBox(height: AppSpacing.s4),
+                  _buildField(
+                    controller: _emailController,
+                    label: 'Email address',
+                    hint: 'you@company.com',
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) {
+                      if (v!.isEmpty) return 'Email is required';
+                      if (!v.contains('@')) return 'Enter a valid email';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.s4),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: ArcoFieldLabel(label: 'Product type'),
+                  ),
+                  const SizedBox(height: AppSpacing.s2),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedProductName,
+                    decoration: const InputDecoration(
+                      hintText: 'Select a product',
+                    ),
+                    items: _productOptions
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p.$1,
+                            child: Text(p.$2, style: AppText.small),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (val) =>
+                        setState(() => _selectedProductName = val),
+                  ),
+                  const SizedBox(height: AppSpacing.s4),
+                  _buildField(
+                    controller: _quantityController,
+                    label: 'Quantity',
+                    hint: '5000',
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      if (v!.isEmpty) return 'Quantity is required';
+                      final n = int.tryParse(v);
+                      if (n == null || n <= 0) {
+                        return 'Enter a valid quantity';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.s4),
+                  _buildField(
+                    controller: _notesController,
+                    label: 'Additional notes (optional)',
+                    hint: 'Delivery to Lahore, custom printing...',
+                    maxLines: 3,
+                    validator: (_) => null,
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: AppSpacing.s6),
+            ArcoButton(
+              label: 'Request quote',
+              expand: true,
+              loading: _isLoading,
+              onPressed: _submitQuote,
             ),
           ],
         ),
@@ -263,57 +209,35 @@ class _QuoteScreenState extends State<QuoteScreen> {
   Widget _buildSuccess() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.s8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.surface1,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_circle_outline,
-                size: 48,
-                color: AppColors.accent,
-              ),
+            const ArcoAlert(
+              variant: ArcoAlertVariant.success,
+              message: 'Quote sent successfully.',
+              icon: Icons.check_circle_outline,
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Quote Sent!',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: AppColors.accent,
-              ),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.s5),
             Text(
               _resultMessage,
               textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppColors.text3),
+              style: AppText.body,
             ),
             if (_quoteSummary.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.surface1,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+              const SizedBox(height: AppSpacing.s4),
+              ArcoPanel(
                 child: Text(
                   _quoteSummary,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    color: AppColors.accent,
-                    height: 1.5,
-                  ),
+                  style: AppText.mono.copyWith(color: AppColors.accent),
                 ),
               ),
             ],
-            const SizedBox(height: 24),
-            OutlinedButton(
+            const SizedBox(height: AppSpacing.s6),
+            ArcoButton(
+              label: 'Request another quote',
+              variant: ArcoButtonVariant.secondary,
+              expand: true,
               onPressed: () => setState(() {
                 _submitted = false;
                 _nameController.clear();
@@ -323,11 +247,6 @@ class _QuoteScreenState extends State<QuoteScreen> {
                 _notesController.clear();
                 _selectedProductName = null;
               }),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.accent,
-                side: const BorderSide(color: AppColors.accent),
-              ),
-              child: Text('Request Another Quote', style: GoogleFonts.plusJakartaSans()),
             ),
           ],
         ),
@@ -346,40 +265,17 @@ class _QuoteScreenState extends State<QuoteScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.text1,
-          ),
-        ),
-        const SizedBox(height: 6),
+        ArcoFieldLabel(label: label),
+        const SizedBox(height: AppSpacing.s2),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
-          decoration: _inputDecoration(hint),
-          style: GoogleFonts.plusJakartaSans(fontSize: 13),
+          style: AppText.small,
+          decoration: InputDecoration(hintText: hint),
         ),
       ],
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: GoogleFonts.plusJakartaSans(color: AppColors.border, fontSize: 13),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: AppColors.accent),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );
   }
 }

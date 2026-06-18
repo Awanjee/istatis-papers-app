@@ -15,23 +15,23 @@ class AuthGate extends StatelessWidget {
       builder: (context, auth, _) {
         if (auth.isLoading) {
           return const Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: AppColors.canvas,
             body: Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: CircularProgressIndicator(),
             ),
           );
         }
 
         if (auth.error != null && !auth.isInitialized) {
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: AppColors.canvas,
             body: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppSpacing.s6),
               child: Center(
                 child: Text(
                   auth.error!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.red),
+                  style: AppText.body.copyWith(color: AppColors.danger),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
-import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/app_theme.dart';
+import '../theme/arco_components.dart';
 
 class SuggestionChips extends StatelessWidget {
   final Function(String) onSuggestionTap;
@@ -17,24 +18,16 @@ class SuggestionChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.s4),
         itemCount: suggestions.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.s2),
         itemBuilder: (context, index) {
-          return ActionChip(
-            label: Text(
-              suggestions[index],
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: AppColors.accent,
-              ),
-            ),
-            backgroundColor: AppColors.surface1,
-            side: const BorderSide(color: AppColors.accent),
-            onPressed: () => onSuggestionTap(suggestions[index]),
+          return ArcoChip(
+            label: suggestions[index],
+            onTap: () => onSuggestionTap(suggestions[index]),
           );
         },
       ),
