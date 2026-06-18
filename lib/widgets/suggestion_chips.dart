@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,13 +27,13 @@ class SuggestionChips extends StatelessWidget {
           return ActionChip(
             label: Text(
               suggestions[index],
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
-                color: const Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
-            backgroundColor: const Color(0xFFf0f7f4),
-            side: const BorderSide(color: Color(0xFF1a472a)),
+            backgroundColor: AppColors.surface1,
+            side: const BorderSide(color: AppColors.accent),
             onPressed: () => onSuggestionTap(suggestions[index]),
           );
         },

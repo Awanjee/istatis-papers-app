@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -112,17 +113,17 @@ class _QuoteScreenState extends State<QuoteScreen> {
           children: [
             Text(
               'Get a Quote',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               'Fill in your details and we\'ll email '
               'you a personalised quote.',
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.text3),
             ),
             const SizedBox(height: 20),
 
@@ -165,10 +166,10 @@ class _QuoteScreenState extends State<QuoteScreen> {
             // Product dropdown
             Text(
               'Product',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: AppColors.text1,
               ),
             ),
             const SizedBox(height: 6),
@@ -177,13 +178,13 @@ class _QuoteScreenState extends State<QuoteScreen> {
               decoration: _inputDecoration(''),
               hint: Text(
                 'Select a product',
-                style: GoogleFonts.inter(color: Colors.grey, fontSize: 13),
+                style: GoogleFonts.plusJakartaSans(color: AppColors.text3, fontSize: 13),
               ),
               items: _productOptions
                   .map(
                     (p) => DropdownMenuItem(
                       value: p.$1,
-                      child: Text(p.$2, style: GoogleFonts.inter(fontSize: 13)),
+                      child: Text(p.$2, style: GoogleFonts.plusJakartaSans(fontSize: 13)),
                     ),
                   )
                   .toList(),
@@ -229,8 +230,8 @@ class _QuoteScreenState extends State<QuoteScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submitQuote,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1a472a),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.accentContrast,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -241,12 +242,12 @@ class _QuoteScreenState extends State<QuoteScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.text1,
                         ),
                       )
                     : Text(
                         'Request Quote',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
@@ -269,43 +270,43 @@ class _QuoteScreenState extends State<QuoteScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
-                color: Color(0xFFf0f7f4),
+                color: AppColors.surface1,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.check_circle_outline,
                 size: 48,
-                color: Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
             const SizedBox(height: 20),
             Text(
               'Quote Sent!',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _resultMessage,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
+              style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppColors.text3),
             ),
             if (_quoteSummary.isNotEmpty) ...[
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFf0f7f4),
+                  color: AppColors.surface1,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   _quoteSummary,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
-                    color: const Color(0xFF1a472a),
+                    color: AppColors.accent,
                     height: 1.5,
                   ),
                 ),
@@ -323,10 +324,10 @@ class _QuoteScreenState extends State<QuoteScreen> {
                 _selectedProductName = null;
               }),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF1a472a),
-                side: const BorderSide(color: Color(0xFF1a472a)),
+                foregroundColor: AppColors.accent,
+                side: const BorderSide(color: AppColors.accent),
               ),
-              child: Text('Request Another Quote', style: GoogleFonts.inter()),
+              child: Text('Request Another Quote', style: GoogleFonts.plusJakartaSans()),
             ),
           ],
         ),
@@ -347,10 +348,10 @@ class _QuoteScreenState extends State<QuoteScreen> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: AppColors.text1,
           ),
         ),
         const SizedBox(height: 6),
@@ -360,7 +361,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
           maxLines: maxLines,
           validator: validator,
           decoration: _inputDecoration(hint),
-          style: GoogleFonts.inter(fontSize: 13),
+          style: GoogleFonts.plusJakartaSans(fontSize: 13),
         ),
       ],
     );
@@ -369,14 +370,14 @@ class _QuoteScreenState extends State<QuoteScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 13),
+      hintStyle: GoogleFonts.plusJakartaSans(color: AppColors.border, fontSize: 13),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: AppColors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF1a472a)),
+        borderSide: const BorderSide(color: AppColors.accent),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     );

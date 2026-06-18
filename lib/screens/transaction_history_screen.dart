@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -52,16 +53,16 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
       children: [
         // Tab bar
         Container(
-          color: Colors.white,
+          color: AppColors.text1,
           child: TabBar(
             controller: _tabController,
-            indicatorColor: const Color(0xFF0B5E72),
-            labelColor: const Color(0xFF0B5E72),
-            unselectedLabelColor: Colors.grey[500],
-            labelStyle: GoogleFonts.inter(
+            indicatorColor: AppColors.accent,
+            labelColor: AppColors.accent,
+            unselectedLabelColor: AppColors.text3,
+            labelStyle: GoogleFonts.plusJakartaSans(
                 fontSize: 13, fontWeight: FontWeight.w600),
             unselectedLabelStyle:
-                GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+                GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w500),
             tabs: const [
               Tab(text: 'Transactions'),
               Tab(text: 'Parties'),
@@ -100,14 +101,14 @@ class _TransactionsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: const Color(0xFF0B5E72),
+      color: AppColors.accent,
       onRefresh: () async => onRefresh(),
       child: FutureBuilder<List<TransactionSummary>>(
         future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF0B5E72)),
+              child: CircularProgressIndicator(color: AppColors.accent),
             );
           }
           if (snapshot.hasError) {
@@ -138,21 +139,21 @@ class _TransactionsTab extends StatelessWidget {
         Column(
           children: [
             Icon(Icons.receipt_long_outlined,
-                size: 64, color: Colors.grey[350]),
+                size: 64, color: AppColors.text3),
             const SizedBox(height: 16),
             Text(
               'No transactions yet',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[500],
+                color: AppColors.text3,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Import and confirm a document\nto see it here.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[400]),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.text3),
             ),
           ],
         ),
@@ -171,7 +172,7 @@ class _TransactionsTab extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Could not load transactions',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                   fontSize: 15, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
@@ -206,12 +207,12 @@ class _TransactionCard extends StatelessWidget {
   };
 
   static const _docTypeColors = {
-    'sales_slip': Color(0xFF1a472a),
-    'price_list': Color(0xFF1565C0),
-    'distribution_record': Color(0xFF6A1B9A),
-    'account_ledger': Color(0xFFE65100),
-    'calculation_note': Color(0xFF00695C),
-    'unknown': Color(0xFF616161),
+    'sales_slip': AppColors.accent,
+    'price_list': AppColors.accent,
+    'distribution_record': AppColors.accent,
+    'account_ledger': AppColors.warning,
+    'calculation_note': AppColors.success,
+    'unknown': AppColors.text3,
   };
 
   @override
@@ -220,7 +221,7 @@ class _TransactionCard extends StatelessWidget {
     final date = _formatDate(tx.transactionDate);
     final label = _docTypeLabels[tx.documentType] ?? tx.documentType ?? 'Doc';
     final chipColor =
-        _docTypeColors[tx.documentType] ?? const Color(0xFF616161);
+        _docTypeColors[tx.documentType] ?? AppColors.text3;
 
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -235,7 +236,7 @@ class _TransactionCard extends StatelessWidget {
       ),
       child: Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.text1,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -266,22 +267,22 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   party,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.text1,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.calendar_today_outlined,
-                        size: 12, color: Colors.grey[500]),
+                        size: 12, color: AppColors.text3),
                     const SizedBox(width: 4),
                     Text(
                       date,
-                      style: GoogleFonts.inter(
-                          fontSize: 12, color: Colors.grey[600]),
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12, color: AppColors.text3),
                     ),
                     const SizedBox(width: 12),
                     Container(
@@ -293,7 +294,7 @@ class _TransactionCard extends StatelessWidget {
                       ),
                       child: Text(
                         label,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: chipColor,
@@ -306,9 +307,9 @@ class _TransactionCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     tx.notes!,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        color: Colors.grey[500],
+                        color: AppColors.text3,
                         fontStyle: FontStyle.italic),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -321,10 +322,10 @@ class _TransactionCard extends StatelessWidget {
           if (tx.totalAmount != null)
             Text(
               'PKR ${_formatAmount(tx.totalAmount!)}',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
         ],

@@ -25,5 +25,5 @@ if errorlevel 1 (
 )
 
 echo.
-echo Done. Live at https://istatis-papers-app-6b721.web.app
+echo Done. Live at https://arco-papers-app-6b721.web.app
 pause

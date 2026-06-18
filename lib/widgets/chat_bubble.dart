@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/message.dart';
@@ -20,7 +21,7 @@ class ChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isUser ? const Color(0xFF1a472a) : const Color(0xFFf0f0f0),
+          color: isUser ? AppColors.accent : AppColors.surface2,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -30,8 +31,8 @@ class ChatBubble extends StatelessWidget {
         ),
         child: Text(
           message.content,
-          style: GoogleFonts.inter(
-            color: isUser ? Colors.white : Colors.black87,
+          style: GoogleFonts.plusJakartaSans(
+            color: isUser ? AppColors.text1 : AppColors.text1,
             fontSize: 14,
             height: 1.5,
           ),

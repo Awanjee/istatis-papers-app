@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,8 +47,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     _totalCtrl = TextEditingController(
       text: r.totals.grandTotal?.toStringAsFixed(0) ?? '',
     );
-    _transactionType =
-        _txTypeDefaults[r.documentType] ?? 'sale';
+    _transactionType = _txTypeDefaults[r.documentType] ?? 'sale';
   }
 
   @override
@@ -66,10 +66,12 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     try {
       await widget.extractionService.confirmExtraction(
         result: widget.result,
-        editedPartyName:
-            _partyCtrl.text.trim().isEmpty ? null : _partyCtrl.text.trim(),
-        editedDate:
-            _dateCtrl.text.trim().isEmpty ? null : _dateCtrl.text.trim(),
+        editedPartyName: _partyCtrl.text.trim().isEmpty
+            ? null
+            : _partyCtrl.text.trim(),
+        editedDate: _dateCtrl.text.trim().isEmpty
+            ? null
+            : _dateCtrl.text.trim(),
         editedTotal: double.tryParse(_totalCtrl.text.trim()),
         transactionType: _transactionType,
       );
@@ -104,20 +106,27 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     final items = widget.result.lineItems;
     String productSummary = '';
     if (items.isNotEmpty) {
-      final lines = items.take(3).map((i) {
-        final code = i.productCode ?? '-';
-        final qty = i.quantity != null ? ' x${i.quantity!.toStringAsFixed(0)}' : '';
-        return '$code$qty';
-      }).join(', ');
+      final lines = items
+          .take(3)
+          .map((i) {
+            final code = i.productCode ?? '-';
+            final qty = i.quantity != null
+                ? ' x${i.quantity!.toStringAsFixed(0)}'
+                : '';
+            return '$code$qty';
+          })
+          .join(', ');
       productSummary = '\nItems: $lines${items.length > 3 ? ' ...' : ''}';
     }
 
-    final txLabel = {
-      'sale': 'Sale',
-      'payment_received': 'Payment received',
-      'purchase': 'Purchase',
-      'expense': 'Expense',
-    }[_transactionType] ?? 'Transaction';
+    final txLabel =
+        {
+          'sale': 'Sale',
+          'payment_received': 'Payment received',
+          'purchase': 'Purchase',
+          'expense': 'Expense',
+        }[_transactionType] ??
+        'Transaction';
 
     final buffer = StringBuffer();
     buffer.writeln('iStatis');
@@ -144,13 +153,13 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
   Color _confColor(double conf) {
     if (conf >= 0.8) return Colors.green[700]!;
     if (conf >= 0.6) return Colors.orange[700]!;
-    return Colors.red[700]!;
+    return AppColors.danger;
   }
 
   Color _confBg(double conf) {
     if (conf >= 0.8) return Colors.green[50]!;
     if (conf >= 0.6) return Colors.orange[50]!;
-    return Colors.red[50]!;
+    return AppColors.dangerSoft;
   }
 
   String _docTypeLabel(String? dt) {
@@ -174,23 +183,26 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
     final r = widget.result;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFf5f5f5),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1a472a),
+        backgroundColor: AppColors.surface1,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Review Extraction',
-              style: GoogleFonts.inter(
-                color: Colors.white,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.text1,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
             Text(
               _docTypeLabel(r.documentType),
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.text2,
+                fontSize: 11,
+              ),
             ),
           ],
         ),
@@ -203,7 +215,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
       ),
       body: _saving
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF1a472a)),
+              child: CircularProgressIndicator(color: AppColors.accent),
             )
           : _buildBody(r),
       bottomNavigationBar: _saving ? null : _buildBottomBar(),
@@ -238,8 +250,9 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
               _EditField(
                 label: 'Total Amount (PKR)',
                 controller: _totalCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
               ),
             ],
           ),
@@ -264,11 +277,13 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
             title: 'Line Items (${r.lineItems.length})',
             child: Column(
               children: r.lineItems
-                  .map((item) => _LineItemTile(
-                        item: item,
-                        confColor: _confColor(item.confidence),
-                        confBg: _confBg(item.confidence),
-                      ))
+                  .map(
+                    (item) => _LineItemTile(
+                      item: item,
+                      confColor: _confColor(item.confidence),
+                      confBg: _confBg(item.confidence),
+                    ),
+                  )
                   .toList(),
             ),
           ),
@@ -277,7 +292,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
         if (r.unreadableSections != null && r.unreadableSections!.isNotEmpty)
           _InfoTile(
             icon: Icons.visibility_off_outlined,
-            color: Colors.grey[700]!,
+            color: AppColors.text2,
             bg: Colors.grey[100]!,
             text: 'Could not read: ${r.unreadableSections}',
           ),
@@ -293,7 +308,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
                 textDirection: TextDirection.rtl,
                 style: GoogleFonts.notoNastaliqUrdu(
                   fontSize: 14,
-                  color: Colors.black87,
+                  color: AppColors.text1,
                   height: 1.8,
                 ),
               ),
@@ -305,8 +320,8 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
             padding: const EdgeInsets.only(top: 12),
             child: _InfoTile(
               icon: Icons.error_outline,
-              color: Colors.red[700]!,
-              bg: Colors.red[50]!,
+              color: AppColors.danger,
+              bg: AppColors.dangerSoft,
               text: _saveError!,
             ),
           ),
@@ -318,7 +333,8 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
 
   Widget _buildWarningBanner(ExtractionResult r) {
     final fields = r.lowConfidenceFields;
-    final hasUnread = r.unreadableSections != null && r.unreadableSections!.isNotEmpty;
+    final hasUnread =
+        r.unreadableSections != null && r.unreadableSections!.isNotEmpty;
 
     String message = 'Some fields may need review';
     if (fields.isNotEmpty) {
@@ -343,7 +359,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 color: Colors.amber[900],
                 fontWeight: FontWeight.w500,
@@ -366,15 +382,15 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: AppColors.text3),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
                   'Discard',
-                  style: GoogleFonts.inter(
-                    color: Colors.grey[700],
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppColors.text2,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -386,8 +402,8 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
               child: ElevatedButton(
                 onPressed: _confirm,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1a472a),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.accentContrast,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -395,7 +411,7 @@ class _ExtractionReviewScreenState extends State<ExtractionReviewScreen> {
                 ),
                 child: Text(
                   'Confirm & Save',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
                   ),
@@ -420,10 +436,15 @@ class _TxTypeSelector extends StatelessWidget {
   const _TxTypeSelector({required this.value, required this.onChanged});
 
   static final _options = [
-    ('sale', 'Sale', Icons.arrow_upward, const Color(0xFF1a472a)),
-    ('payment_received', 'Payment In', Icons.payments_outlined, const Color(0xFF1565C0)),
-    ('purchase', 'Purchase', Icons.arrow_downward, const Color(0xFF6A1B9A)),
-    ('expense', 'Expense', Icons.receipt_outlined, const Color(0xFFE65100)),
+    ('sale', 'Sale', Icons.arrow_upward, AppColors.accent),
+    (
+      'payment_received',
+      'Payment In',
+      Icons.payments_outlined,
+      AppColors.accent,
+    ),
+    ('purchase', 'Purchase', Icons.arrow_downward, AppColors.accent),
+    ('expense', 'Expense', Icons.receipt_outlined, AppColors.warning),
   ];
 
   @override
@@ -443,23 +464,21 @@ class _TxTypeSelector extends StatelessWidget {
               color: selected ? color.withOpacity(0.12) : Colors.grey[100],
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: selected ? color : Colors.grey[300]!,
+                color: selected ? color : AppColors.border,
                 width: selected ? 1.5 : 1,
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon,
-                    size: 14,
-                    color: selected ? color : Colors.grey[500]),
+                Icon(icon, size: 14, color: selected ? color : AppColors.text3),
                 const SizedBox(width: 6),
                 Text(
                   label,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    color: selected ? color : Colors.grey[600],
+                    color: selected ? color : AppColors.text3,
                   ),
                 ),
               ],
@@ -484,7 +503,7 @@ class _ConfidenceBadge extends StatelessWidget {
     } else if (confidence >= 0.6) {
       bg = Colors.orange[700]!;
     } else {
-      bg = Colors.red[700]!;
+      bg = AppColors.danger;
     }
 
     return Container(
@@ -495,8 +514,8 @@ class _ConfidenceBadge extends StatelessWidget {
       ),
       child: Text(
         '$pct%',
-        style: GoogleFonts.inter(
-          color: Colors.white,
+        style: GoogleFonts.plusJakartaSans(
+          color: AppColors.text1,
           fontSize: 12,
           fontWeight: FontWeight.w700,
         ),
@@ -514,7 +533,7 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.text1,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -530,10 +549,10 @@ class _SectionCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: Colors.grey[500],
+              color: AppColors.text3,
               letterSpacing: 0.8,
             ),
           ),
@@ -567,40 +586,45 @@ class _EditField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+            color: AppColors.text2,
           ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
-          style: GoogleFonts.inter(fontSize: 14),
+          style: GoogleFonts.plusJakartaSans(fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.inter(fontSize: 14, color: Colors.grey[400]),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            hintStyle: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              color: AppColors.text3,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: const BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: const BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF1a472a), width: 1.5),
+              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
             ),
             suffix: urduHint != null
                 ? Text(
                     urduHint!,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
-                      color: Colors.grey[500],
+                      color: AppColors.text3,
                     ),
                     textDirection: TextDirection.rtl,
                   )
@@ -648,19 +672,19 @@ class _LineItemTile extends StatelessWidget {
               children: [
                 Text(
                   code,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: AppColors.text1,
                   ),
                 ),
                 if (desc != null && desc.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     desc,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: AppColors.text3,
                     ),
                   ),
                 ],
@@ -669,7 +693,12 @@ class _LineItemTile extends StatelessWidget {
                   spacing: 12,
                   children: [
                     if (qty != null)
-                      _MiniStat(label: 'qty', value: qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 2)),
+                      _MiniStat(
+                        label: 'qty',
+                        value: qty.toStringAsFixed(
+                          qty.truncateToDouble() == qty ? 0 : 2,
+                        ),
+                      ),
                     if (price != null)
                       _MiniStat(label: 'unit', value: price.toStringAsFixed(0)),
                     if (amt != null)
@@ -680,9 +709,9 @@ class _LineItemTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     item.notes!,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
-                      color: Colors.grey[500],
+                      color: AppColors.text3,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -698,7 +727,7 @@ class _LineItemTile extends StatelessWidget {
             ),
             child: Text(
               '$pct%',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: confColor,
@@ -720,7 +749,7 @@ class _MiniStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       '$label: $value',
-      style: GoogleFonts.inter(fontSize: 12, color: Colors.black87),
+      style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.text1),
     );
   }
 }
@@ -754,14 +783,15 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
-    if (mounted) Navigator.pop(context); // close sheet; review screen pops itself after
+    if (mounted)
+      Navigator.pop(context); // close sheet; review screen pops itself after
   }
 
   void _copyToClipboard() {
     Clipboard.setData(ClipboardData(text: _msgCtrl.text.trim()));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
   }
 
   @override
@@ -780,22 +810,33 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF25D366).withOpacity(0.12),
+                    color: AppColors.successSoft,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.chat_outlined,
-                      color: Color(0xFF25D366), size: 20),
+                  child: const Icon(
+                    Icons.chat_outlined,
+                    color: AppColors.success,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Send on WhatsApp',
-                        style: GoogleFonts.inter(
-                            fontSize: 15, fontWeight: FontWeight.w700)),
-                    Text('Edit then open WhatsApp',
-                        style: GoogleFonts.inter(
-                            fontSize: 12, color: Colors.grey[500])),
+                    Text(
+                      'Send on WhatsApp',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'Edit then open WhatsApp',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: AppColors.text3,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -805,15 +846,17 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
             // Editable message
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF0FDF4),
+                color: AppColors.surface1,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: const Color(0xFF25D366).withOpacity(0.3)),
+                border: Border.all(color: AppColors.success.withOpacity(0.3)),
               ),
               child: TextField(
                 controller: _msgCtrl,
                 maxLines: 6,
-                style: GoogleFonts.inter(fontSize: 13, color: Colors.black87),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: AppColors.text1,
+                ),
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.all(14),
                   border: InputBorder.none,
@@ -828,7 +871,7 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                 IconButton(
                   onPressed: _copyToClipboard,
                   icon: const Icon(Icons.copy_outlined),
-                  color: Colors.grey[600],
+                  color: AppColors.text3,
                   tooltip: 'Copy',
                 ),
                 const SizedBox(width: 4),
@@ -837,14 +880,18 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey[300]!),
+                      side: const BorderSide(color: AppColors.border),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    child: Text('Skip',
-                        style: GoogleFonts.inter(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w600)),
+                    child: Text(
+                      'Skip',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: AppColors.text3,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -853,15 +900,19 @@ class _WhatsAppSheetState extends State<_WhatsAppSheet> {
                   child: ElevatedButton.icon(
                     onPressed: _launch,
                     icon: const Icon(Icons.send_outlined, size: 16),
-                    label: Text('Open WhatsApp',
-                        style:
-                            GoogleFonts.inter(fontWeight: FontWeight.w700)),
+                    label: Text(
+                      'Open WhatsApp',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.success,
+                      foregroundColor: AppColors.accentContrast,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -904,7 +955,7 @@ class _InfoTile extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.inter(fontSize: 13, color: color),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: color),
             ),
           ),
         ],

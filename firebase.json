@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "istatis-papers-app-6b721",
+    "site": "arco-papers-app-6b721",
     "public": "build/web",
     "ignore": [
       "firebase.json",

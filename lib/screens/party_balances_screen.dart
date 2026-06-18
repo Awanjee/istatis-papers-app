@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,14 +35,14 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: const Color(0xFF0B5E72),
+      color: AppColors.accent,
       onRefresh: () async => _refresh(),
       child: FutureBuilder<List<PartyBalance>>(
         future: _future,
         builder: (context, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF0B5E72)),
+              child: CircularProgressIndicator(color: AppColors.accent),
             );
           }
           if (snap.hasError) {
@@ -90,21 +91,21 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
         Column(
           children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey[350]),
+            Icon(Icons.people_outline, size: 64, color: AppColors.text3),
             const SizedBox(height: 16),
             Text(
               'No parties yet',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[500],
+                color: AppColors.text3,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Confirm a transaction to see\nparty balances here.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[400]),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.text3),
             ),
           ],
         ),
@@ -121,7 +122,7 @@ class _PartyBalancesScreenState extends State<PartyBalancesScreen> {
           const SizedBox(height: 12),
           Text(
             'Could not load balances',
-            style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+            style: GoogleFonts.plusJakartaSans(fontSize: 15, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           TextButton(onPressed: _refresh, child: const Text('Retry')),
@@ -149,7 +150,7 @@ class _SummaryRow extends StatelessWidget {
           child: _SummaryCard(
             label: 'Owed to iStatis',
             amount: totalOwed,
-            color: const Color(0xFF0B5E72),
+            color: AppColors.accent,
             icon: Icons.arrow_circle_up_outlined,
           ),
         ),
@@ -158,7 +159,7 @@ class _SummaryRow extends StatelessWidget {
           child: _SummaryCard(
             label: 'iStatis Owes',
             amount: totalOwing,
-            color: const Color(0xFFE65100),
+            color: AppColors.warning,
             icon: Icons.arrow_circle_down_outlined,
           ),
         ),
@@ -198,7 +199,7 @@ class _SummaryCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 label,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -209,7 +210,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'PKR ${_fmt(amount)}',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 16,
               fontWeight: FontWeight.w800,
               color: color,
@@ -241,14 +242,14 @@ class _PartyCard extends StatelessWidget {
     final balance = party.balance;
     final isOwed = balance >= 0; // party owes iStatis
     final balanceColor =
-        isOwed ? const Color(0xFF0B5E72) : const Color(0xFFE65100);
+        isOwed ? AppColors.accent : AppColors.warning;
     final lastDate = _formatDate(party.lastTransactionDate);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.text1,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -278,10 +279,10 @@ class _PartyCard extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: AppColors.text1,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -289,16 +290,16 @@ class _PartyCard extends StatelessWidget {
                     children: [
                       Text(
                         '${party.transactionCount} transactions',
-                        style: GoogleFonts.inter(
-                            fontSize: 12, color: Colors.grey[500]),
+                        style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12, color: AppColors.text3),
                       ),
                       if (lastDate != null) ...[
                         Text('  ·  ',
-                            style: GoogleFonts.inter(color: Colors.grey[400])),
+                            style: GoogleFonts.plusJakartaSans(color: AppColors.text3)),
                         Text(
                           'Last: $lastDate',
-                          style: GoogleFonts.inter(
-                              fontSize: 12, color: Colors.grey[500]),
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12, color: AppColors.text3),
                         ),
                       ],
                     ],
@@ -312,7 +313,7 @@ class _PartyCard extends StatelessWidget {
               children: [
                 Text(
                   'PKR ${_fmtAbs(balance)}',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: balanceColor,
@@ -321,7 +322,7 @@ class _PartyCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   isOwed ? 'owes iStatis' : 'iStatis owes',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
                     color: balanceColor.withOpacity(0.7),
                   ),
@@ -329,7 +330,7 @@ class _PartyCard extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 8),
-            Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+            Icon(Icons.chevron_right, color: AppColors.text3, size: 20),
           ],
         ),
       ),
@@ -392,30 +393,30 @@ class _PartyTransactionHistoryScreenState
     final balance = widget.party.balance;
     final isOwed = balance >= 0;
     final balanceColor =
-        isOwed ? const Color(0xFF0B5E72) : const Color(0xFFE65100);
+        isOwed ? AppColors.accent : AppColors.warning;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFf5f5f5),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B5E72),
+        backgroundColor: AppColors.surface1,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               name,
-              style: GoogleFonts.inter(
-                color: Colors.white,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.text1,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
             Text(
               '${isOwed ? "Owes" : "Owed"} PKR ${_fmtAbs(balance)}',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+              style: GoogleFonts.plusJakartaSans(color: AppColors.text2, fontSize: 11),
             ),
           ],
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.text1),
       ),
       body: FutureBuilder<List<TransactionSummary>>(
         future: _future,
@@ -428,13 +429,13 @@ class _PartyTransactionHistoryScreenState
           if (snap.hasError) {
             return Center(
               child: Text('Could not load.',
-                  style: GoogleFonts.inter(color: Colors.grey[600])));
+                  style: GoogleFonts.plusJakartaSans(color: AppColors.text3)));
           }
           final txs = snap.data ?? [];
           if (txs.isEmpty) {
             return Center(
               child: Text('No transactions found.',
-                  style: GoogleFonts.inter(color: Colors.grey[500])));
+                  style: GoogleFonts.plusJakartaSans(color: AppColors.text3)));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -459,10 +460,10 @@ class _PartyTxRow extends StatelessWidget {
   const _PartyTxRow({required this.tx, required this.service});
 
   static const _txTypeColors = {
-    'sale': Color(0xFF0B5E72),
-    'payment_received': Color(0xFF1565C0),
-    'purchase': Color(0xFF6A1B9A),
-    'expense': Color(0xFFE65100),
+    'sale': AppColors.accent,
+    'payment_received': AppColors.accent,
+    'purchase': AppColors.accent,
+    'expense': AppColors.warning,
   };
 
   static const _txTypeLabels = {
@@ -475,7 +476,7 @@ class _PartyTxRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final txType = tx.transactionType ?? 'sale';
-    final color = _txTypeColors[txType] ?? const Color(0xFF616161);
+    final color = _txTypeColors[txType] ?? AppColors.text3;
     final label = _txTypeLabels[txType] ?? txType;
     final isCredit = txType == 'payment_received';
 
@@ -492,7 +493,7 @@ class _PartyTxRow extends StatelessWidget {
       ),
       child: Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.text1,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -529,7 +530,7 @@ class _PartyTxRow extends StatelessWidget {
                       ),
                       child: Text(
                         label,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: color,
@@ -539,8 +540,8 @@ class _PartyTxRow extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       _formatDate(tx.transactionDate),
-                      style: GoogleFonts.inter(
-                          fontSize: 12, color: Colors.grey[500]),
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12, color: AppColors.text3),
                     ),
                   ],
                 ),
@@ -548,9 +549,9 @@ class _PartyTxRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     tx.notes!,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        color: Colors.grey[500],
+                        color: AppColors.text3,
                         fontStyle: FontStyle.italic),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -562,10 +563,10 @@ class _PartyTxRow extends StatelessWidget {
           if (tx.totalAmount != null)
             Text(
               '${isCredit ? "-" : "+"}PKR ${_fmt(tx.totalAmount!)}',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: isCredit ? const Color(0xFF1565C0) : const Color(0xFF0B5E72),
+                color: isCredit ? AppColors.accent : AppColors.accent,
               ),
             ),
         ],

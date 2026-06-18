@@ -1,3 +1,4 @@
+import '../../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -116,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: AppColors.text1,
                       ),
                     )
                   : const Text('Log in'),

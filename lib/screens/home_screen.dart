@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -33,9 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFf5f5f5),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1a472a),
+        backgroundColor: AppColors.surface1,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -49,8 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   : _currentIndex == 3
                   ? 'Import Document'
                   : 'Ledger',
-              style: GoogleFonts.inter(
-                color: Colors.white,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.text1,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -65,19 +66,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   : _currentIndex == 3
                   ? 'Receipts, khata pages & invoices'
                   : 'Confirmed transactions',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 11),
+              style: GoogleFonts.plusJakartaSans(color: AppColors.text2, fontSize: 11),
             ),
           ],
         ),
         actions: [
           if (_currentIndex == 0)
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.white),
+              icon: const Icon(Icons.refresh, color: AppColors.text1),
               onPressed: () => context.read<ChatProvider>().clearMessages(),
               tooltip: 'Clear chat',
             ),
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout, color: AppColors.text1),
             onPressed: () => context.read<AuthProvider>().signOut(),
             tooltip: 'Log out',
           ),
@@ -88,8 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF1a472a),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.accent,
+        unselectedItemColor: AppColors.text3,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_outlined),
@@ -188,15 +189,15 @@ class _ChatTabState extends State<_ChatTab> {
             const Icon(
               Icons.inventory_2_outlined,
               size: 64,
-              color: Color(0xFF1a472a),
+              color: AppColors.accent,
             ),
             const SizedBox(height: 16),
             Text(
               'iStatis',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1a472a),
+                color: AppColors.accent,
               ),
             ),
             const SizedBox(height: 8),
@@ -204,9 +205,9 @@ class _ChatTabState extends State<_ChatTab> {
               'Ask me about envelopes, paper, file '
               'carriers, bulk pricing, or place an order.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
-                color: Colors.grey,
+                color: AppColors.text3,
                 height: 1.5,
               ),
             ),

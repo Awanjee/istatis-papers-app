@@ -35,17 +35,17 @@ class AuthShell extends StatelessWidget {
                   const SizedBox(height: 32),
                   Text(
                     title,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black87,
+                      color: AppColors.text1,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     subtitle,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       color: AppColors.muted,
                       height: 1.4,
@@ -91,14 +91,14 @@ class _BrandHeader extends StatelessWidget {
           ),
           child: const Icon(
             Icons.inventory_2_outlined,
-            color: Colors.white,
+            color: AppColors.text1,
             size: 36,
           ),
         ),
         const SizedBox(height: 12),
         Text(
           'iStatis',
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: AppColors.primary,

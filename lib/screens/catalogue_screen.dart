@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:istatis_app/screens/quote_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,7 +41,7 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
 
   Widget _buildCategoryFilter() {
     return Container(
-      color: Colors.white,
+      color: AppColors.text1,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       child: SizedBox(
         height: 36,
@@ -56,9 +57,9 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
               child: FilterChip(
                 label: Text(
                   cat,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
-                    color: isSelected ? Colors.white : const Color(0xFF1a472a),
+                    color: isSelected ? AppColors.text1 : AppColors.accent,
                     fontWeight: isSelected
                         ? FontWeight.w600
                         : FontWeight.normal,
@@ -66,10 +67,10 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
                 ),
                 selected: isSelected,
                 onSelected: (_) => setState(() => _selectedCategory = cat),
-                selectedColor: const Color(0xFF1a472a),
-                backgroundColor: const Color(0xFFf0f7f4),
-                checkmarkColor: Colors.white,
-                side: const BorderSide(color: Color(0xFF1a472a)),
+                selectedColor: AppColors.accentSoft2,
+                backgroundColor: AppColors.surface1,
+                checkmarkColor: AppColors.accent,
+                side: const BorderSide(color: AppColors.accent),
               ),
             );
           },
@@ -91,7 +92,7 @@ class _ProductCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: AppColors.borderSubtle),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -107,14 +108,14 @@ class _ProductCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFf0f7f4),
+                    color: AppColors.surface1,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     product.category,
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
-                      color: const Color(0xFF1a472a),
+                      color: AppColors.accent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -122,7 +123,7 @@ class _ProductCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   'Min: ${product.minOrder.toString()} units',
-                  style: GoogleFonts.inter(fontSize: 11, color: Colors.grey),
+                  style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.text3),
                 ),
               ],
             ),
@@ -131,10 +132,10 @@ class _ProductCard extends StatelessWidget {
             // Product name
             Text(
               product.name,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
+                color: AppColors.text1,
               ),
             ),
             const SizedBox(height: 4),
@@ -142,9 +143,9 @@ class _ProductCard extends StatelessWidget {
             // Description
             Text(
               product.description,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
-                color: Colors.grey.shade600,
+                color: AppColors.text3,
                 height: 1.4,
               ),
             ),
@@ -155,10 +156,10 @@ class _ProductCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Bulk Pricing (PKR)',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.black54,
+                color: AppColors.text2,
               ),
             ),
             const SizedBox(height: 8),
@@ -177,15 +178,15 @@ class _ProductCard extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () => _showQuoteDialog(context),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF1a472a),
-                  side: const BorderSide(color: Color(0xFF1a472a)),
+                  foregroundColor: AppColors.accent,
+                  side: const BorderSide(color: AppColors.accent),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: Text(
                   'Request Quote',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
@@ -204,15 +205,15 @@ class _ProductCard extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color(0xFF1a472a),
+            backgroundColor: AppColors.surface1,
             title: Text(
               'Request Quote',
-              style: GoogleFonts.inter(
-                color: Colors.white,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.text1,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            iconTheme: const IconThemeData(color: Colors.white),
+            iconTheme: const IconThemeData(color: AppColors.text1),
           ),
           body: QuoteScreen(preselectedProduct: product),
         ),
@@ -231,22 +232,22 @@ class _PricingChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFf0f7f4),
+        color: AppColors.surface1,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFc8e6c9)),
+        border: Border.all(color: AppColors.borderSubtle),
       ),
       child: Column(
         children: [
           Text(
             tier.label,
-            style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade600),
+            style: GoogleFonts.plusJakartaSans(fontSize: 10, color: AppColors.text3),
           ),
           Text(
             'PKR ${tier.pricePerUnit % 1 == 0 ? tier.pricePerUnit.toInt() : tier.pricePerUnit}',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF1a472a),
+              color: AppColors.accent,
             ),
           ),
         ],

@@ -26,7 +26,7 @@ class IstatisApp extends StatelessWidget {
       child: MaterialApp(
         title: 'iStatis',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
+        theme: AppTheme.dark,
         home: const AuthGate(),
       ),
     );

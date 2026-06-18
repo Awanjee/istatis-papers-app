@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -32,8 +33,8 @@ class _ChatInputState extends State<ChatInput> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: AppColors.text1,
+        border: Border(top: BorderSide(color: AppColors.borderSubtle)),
       ),
       child: Row(
         children: [
@@ -43,14 +44,14 @@ class _ChatInputState extends State<ChatInput> {
               onSubmitted: (_) => _send(),
               decoration: InputDecoration(
                 hintText: 'Ask about products or pricing...',
-                hintStyle: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
+                hintStyle: GoogleFonts.plusJakartaSans(color: AppColors.text3, fontSize: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: BorderSide(color: AppColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: const BorderSide(color: Color(0xFF1a472a)),
+                  borderSide: const BorderSide(color: AppColors.accent),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -62,7 +63,7 @@ class _ChatInputState extends State<ChatInput> {
           const SizedBox(width: 8),
           Container(
             decoration: const BoxDecoration(
-              color: Color(0xFF1a472a),
+              color: AppColors.accent,
               shape: BoxShape.circle,
             ),
             child: IconButton(
@@ -73,10 +74,10 @@ class _ChatInputState extends State<ChatInput> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: AppColors.text1,
                       ),
                     )
-                  : const Icon(Icons.send, color: Colors.white),
+                  : const Icon(Icons.send, color: AppColors.text1),
             ),
           ),
         ],

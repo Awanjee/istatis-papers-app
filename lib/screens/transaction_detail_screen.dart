@@ -1,3 +1,4 @@
+import '../theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -82,17 +83,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0B5E72),
+        backgroundColor: AppColors.surface1,
+        foregroundColor: AppColors.accent,
         elevation: 0,
         title: Text(
           widget.initialPartyName ?? 'Transaction',
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF0B5E72),
+            color: AppColors.accent,
           ),
         ),
       ),
@@ -101,7 +102,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF0B5E72)),
+              child: CircularProgressIndicator(color: AppColors.accent),
             );
           }
           if (snapshot.hasError) {
@@ -115,7 +116,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'Could not load transaction details',
-                      style: GoogleFonts.inter(fontSize: 15),
+                      style: GoogleFonts.plusJakartaSans(fontSize: 15),
                     ),
                   ],
                 ),
@@ -148,10 +149,10 @@ class _TransactionDetailBody extends StatelessWidget {
   };
 
   static const _txTypeColors = {
-    'sale': Color(0xFF1a472a),
-    'payment_received': Color(0xFF0B5E72),
-    'purchase': Color(0xFF6A1B9A),
-    'expense': Color(0xFFE65100),
+    'sale': AppColors.accent,
+    'payment_received': AppColors.accent,
+    'purchase': AppColors.accent,
+    'expense': AppColors.warning,
   };
 
   static const _docTypeLabels = {
@@ -166,7 +167,7 @@ class _TransactionDetailBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final txType = tx.transactionType ?? 'sale';
-    final txColor = _txTypeColors[txType] ?? const Color(0xFF616161);
+    final txColor = _txTypeColors[txType] ?? AppColors.text3;
     final txLabel = _txTypeLabels[txType] ?? txType;
     final docLabel =
         _docTypeLabels[tx.documentType] ?? tx.documentType ?? 'Doc';
@@ -186,10 +187,10 @@ class _TransactionDetailBody extends StatelessWidget {
                   Expanded(
                     child: Text(
                       party,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        color: AppColors.text1,
                       ),
                     ),
                   ),
@@ -206,7 +207,7 @@ class _TransactionDetailBody extends StatelessWidget {
                     tx.partyNameUrdu!,
                     style: GoogleFonts.notoNastaliqUrdu(
                       fontSize: 16,
-                      color: Colors.black54,
+                      color: AppColors.text2,
                     ),
                   ),
                 ),
@@ -233,17 +234,17 @@ class _TransactionDetailBody extends StatelessWidget {
                 children: [
                   Text(
                     'Total',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: AppColors.text2,
                     ),
                   ),
                   Text(
                     tx.totalAmount != null
                         ? 'PKR ${_formatAmount(tx.totalAmount!)}'
                         : 'N/A',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: txColor,
@@ -265,9 +266,9 @@ class _TransactionDetailBody extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Text(
                   'No line items recorded',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
-                    color: Colors.grey[400],
+                    color: AppColors.text3,
                   ),
                 ),
               ),
@@ -278,10 +279,10 @@ class _TransactionDetailBody extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 8),
             child: Text(
               'Line Items (${tx.lineItems.length})',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                color: AppColors.text3,
                 letterSpacing: 0.3,
               ),
             ),
@@ -302,10 +303,10 @@ class _TransactionDetailBody extends StatelessWidget {
                         flex: 5,
                         child: Text(
                           'PRODUCT',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: Colors.grey[500],
+                            color: AppColors.text3,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -315,10 +316,10 @@ class _TransactionDetailBody extends StatelessWidget {
                         child: Text(
                           'QTY × PRICE',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: Colors.grey[500],
+                            color: AppColors.text3,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -328,10 +329,10 @@ class _TransactionDetailBody extends StatelessWidget {
                         child: Text(
                           'AMOUNT',
                           textAlign: TextAlign.right,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: Colors.grey[500],
+                            color: AppColors.text3,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -440,10 +441,10 @@ class _LineItemRow extends StatelessWidget {
                         Expanded(
                           child: Text(
                             code,
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: AppColors.text1,
                             ),
                           ),
                         ),
@@ -452,9 +453,9 @@ class _LineItemRow extends StatelessWidget {
                     if (item.productCode != null)
                       Text(
                         item.productCode!,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
-                          color: Colors.grey[500],
+                          color: AppColors.text3,
                         ),
                       ),
                     if (desc != null && desc.isNotEmpty)
@@ -462,9 +463,9 @@ class _LineItemRow extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           desc,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: AppColors.text3,
                             fontStyle: FontStyle.italic,
                           ),
                         ),
@@ -474,7 +475,7 @@ class _LineItemRow extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           item.notes!,
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             color: Colors.orange[400],
                             fontStyle: FontStyle.italic,
@@ -490,7 +491,10 @@ class _LineItemRow extends StatelessWidget {
                 child: Text(
                   qtyPrice ?? (qtyStr ?? ''),
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(fontSize: 13, color: Colors.black54),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    color: AppColors.text2,
+                  ),
                 ),
               ),
               // Amount
@@ -499,7 +503,7 @@ class _LineItemRow extends StatelessWidget {
                 child: Text(
                   amountStr ?? '',
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: txColor,
@@ -541,7 +545,7 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.text1,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -573,7 +577,7 @@ class _Chip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(
+        style: GoogleFonts.plusJakartaSans(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: color,
@@ -598,14 +602,14 @@ class _MetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: Colors.grey[500]),
+        Icon(icon, size: 14, color: AppColors.text3),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
-              color: Colors.grey[600],
+              color: AppColors.text3,
               fontStyle: italic ? FontStyle.italic : FontStyle.normal,
             ),
           ),
