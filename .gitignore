@@ -1,3 +1,6 @@
+# Local dev scripts with credentials (never commit)
+run.ps1
+
 # Miscellaneous
 *.class
 *.log
